@@ -11,7 +11,19 @@ func SimulateBiofilm(initialCulture Culture, numGens int, time float64) []Cultur
 	return timePoints
 }
 
-//Test comment from Brian
-//This comment tests if the commit is working
+// UpdateCulture takes as input a Culture object and a time float64 parameter.
+// It returns a new Culture object corresponding to updating each Cell's position, velocity, and acceleration within
+// the given time interval
+func UpdateCulture(currentCulture Culture, time float64) Culture {
+	//Create a copy of the current culture to alter
+	newCulture := CopyCulture(currentCulture)
+
+	//Iterate over all Cells in the newly created Culture and update their fields
+	for i := range newCulture.cells {
+		//Update position functions go here
+	}
+
+	return newCulture
+}
 
 //test
