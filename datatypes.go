@@ -5,6 +5,7 @@ package main
 // Position is the position of the bottom-left corner of the rectangle of the cell.
 type RodCell struct {
 	length, width, angle float64
+	red, green, blue     uint8
 	position             OrderedPair
 }
 
@@ -17,4 +18,7 @@ type OrderedPair struct {
 // Culture represents all the cells in the biofilm at the time.
 type Culture struct {
 	cells []*RodCell
+
+	//Width represents the width of the "canvas" where cells grow
+	width float64
 }
