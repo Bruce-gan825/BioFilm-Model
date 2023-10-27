@@ -11,7 +11,24 @@ func SimulateBiofilm(initialCulture Culture, numGens int, time float64) []Cultur
 	return timePoints
 }
 
-//Test comment from Brian
-//This comment tests if the commit is working
+// CopyCulture returns a different culture that has same cells as the input culture
+func CopyCulture(culture Culture) Culture {
+	var copy Culture
+	copy.cells = make([]*RodCell, len(culture.cells))
+	for i := range copy.cells {
+		copy.cells[i] = CopyCell(culture.cells[i])
+	}
+	return copy
+}
 
-//test
+// CopyCell returns a different cell that has same fields as the input cell
+func CopyCell(cell *RodCell) *RodCell {
+	copy := &RodCell{}
+	copy.length = cell.length
+	copy.maxLength = cell.maxLength
+	copy.width = cell.width
+	copy.angle = cell.angle
+	copy.position.x = cell.position.x
+	copy.position.y = cell.position.y
+	return copy
+}
