@@ -10,3 +10,6 @@ func SimulateBiofilm(initialCulture Culture, numGens int, time float64) []Cultur
 	}
 	return timePoints
 }
+
+//Test comment from Brian
+//This comment tests if the commit is working
