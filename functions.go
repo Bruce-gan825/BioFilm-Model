@@ -6,7 +6,7 @@ func SimulateBiofilm(initialCulture Culture, numGens int, time float64) []Cultur
 	timePoints := make([]Culture, numGens+1)
 	timePoints[0] = initialCulture
 	for i := 1; i < numGens+1; i++ {
-		timePoints[i] = UpdateCulture(timePoints[i-1])
+		timePoints[i] = UpdateCulture(timePoints[i-1], time)
 	}
 	return timePoints
 }

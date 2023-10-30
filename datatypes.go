@@ -4,9 +4,9 @@ package main
 // Width is the width of the rectangle part and also width/2 is the radius of circle part.
 // Position is the position of the bottom-left corner of the rectangle of the cell.
 type RodCell struct {
-	length, width, angle float64
-	red, green, blue     uint8
-	position             OrderedPair
+	length, width, angle, maxLength float64
+	red, green, blue                uint8
+	position                        OrderedPair
 }
 
 // OrderedPair contains two float64 fields corresponding to
