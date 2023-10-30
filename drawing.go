@@ -32,14 +32,22 @@ func DrawToCanvas(culture Culture, canvasWidth int) image.Image {
 	c.ClearRect(0, 0, canvasWidth, canvasWidth)
 	c.Fill()
 
-	// Iterate over each individual Boid and draw as a circle of pixel radius 5
+	// Iterate over each individual RodCell and draw as a rounded rectangle
+	// Each rounded rectangle has width, height, and rounded corners with radius width
 	for _, b := range culture.cells {
-		//Retrieve the randomized colour of each Boid from its fields
+		//Retrieve the randomized colour of each RodCell from its fields
 		c.SetFillColor(canvas.MakeColor(b.red, b.green, b.blue))
-		centreX := (b.position.x / culture.width) * float64(canvasWidth)
-		centreY := (b.position.y / culture.width) * float64(canvasWidth)
-		r := 5.0
-		c.Circle(centreX, centreY, r)
+
+		//Draw each RodCell's central rectangle first
+		topX := (b.position.x / culture.width) * float64(canvasWidth)
+		topY := (b.position.y / culture.width) * float64(canvasWidth)
+		c.ClearRect(int(topX), int(topY), int(topX+b.length), int(topY+b.width))
+
+		//Draw a circle at the ends of the central rectangle
+		//REMEMBER TO ADJUST CIRCLE X/Y POSITION WHEN ROTATING
+		c.Circle(topX, topY+(b.width/2), b.width/2)
+		c.Circle(topX+b.length, topY+(b.width/2), b.width/2)
+
 		c.Fill()
 	}
 	// Return the image created
