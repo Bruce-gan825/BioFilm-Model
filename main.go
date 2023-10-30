@@ -18,8 +18,8 @@ func main() {
 	bac4.red, bac4.green, bac4.blue = 240, 240, 100
 
 	bac1.position.x, bac1.position.y = 400, 400
-	bac2.position.x, bac2.position.y = 500, 500
-	bac3.position.x, bac3.position.y = 450, 550
+	bac2.position.x, bac2.position.y = 600, 600
+	bac3.position.x, bac3.position.y = 700, 550
 	bac4.position.x, bac4.position.y = 350, 450
 
 	bac1.width, bac1.length = 20, 50

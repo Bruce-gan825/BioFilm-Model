@@ -25,7 +25,9 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 	//Iterate over all Cells in the newly created Culture and update their fields
 	for i := range newCulture.cells {
 		//Update position functions go here
-		fmt.Println(i)
+		if i > 99999999999999 {
+			fmt.Println("No")
+		}
 	}
 
 	return newCulture
@@ -33,22 +35,22 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 
 // CopyCulture returns a different culture that has same cells as the input culture
 func CopyCulture(culture Culture) Culture {
-	var copy Culture
-	copy.cells = make([]*RodCell, len(culture.cells))
-	for i := range copy.cells {
-		copy.cells[i] = CopyCell(culture.cells[i])
+	var newCulture Culture
+	newCulture.cells = make([]*RodCell, len(culture.cells))
+	for i := range newCulture.cells {
+		newCulture.cells[i] = CopyCell(culture.cells[i])
 	}
-	return copy
+	return newCulture
 }
 
 // CopyCell returns a different cell that has same fields as the input cell
 func CopyCell(cell *RodCell) *RodCell {
-	copy := &RodCell{}
-	copy.length = cell.length
-	copy.maxLength = cell.maxLength
-	copy.width = cell.width
-	copy.angle = cell.angle
-	copy.position.x = cell.position.x
-	copy.position.y = cell.position.y
-	return copy
+	newCell := &RodCell{}
+	newCell.length = cell.length
+	newCell.maxLength = cell.maxLength
+	newCell.width = cell.width
+	newCell.angle = cell.angle
+	newCell.position.x = cell.position.x
+	newCell.position.y = cell.position.y
+	return newCell
 }
