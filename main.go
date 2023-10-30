@@ -37,7 +37,7 @@ func main() {
 	initialCulture.cells = []*RodCell{b1p, b2p, b3p, b4p}
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture, 1000, 5)
+	timePoints := SimulateBiofilm(initialCulture, 500, 5)
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
 

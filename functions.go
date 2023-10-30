@@ -40,17 +40,23 @@ func CopyCulture(culture Culture) Culture {
 	for i := range newCulture.cells {
 		newCulture.cells[i] = CopyCell(culture.cells[i])
 	}
+	newCulture.width = culture.width
 	return newCulture
 }
 
 // CopyCell returns a different cell that has same fields as the input cell
 func CopyCell(cell *RodCell) *RodCell {
-	newCell := &RodCell{}
+	//newCell := &RodCell{}
+	var newCell RodCell
 	newCell.length = cell.length
 	newCell.maxLength = cell.maxLength
 	newCell.width = cell.width
 	newCell.angle = cell.angle
 	newCell.position.x = cell.position.x
 	newCell.position.y = cell.position.y
-	return newCell
+	newCell.red = cell.red
+	newCell.blue = cell.blue
+	newCell.green = cell.green
+
+	return &newCell
 }
