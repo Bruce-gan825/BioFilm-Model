@@ -22,6 +22,12 @@ func main() {
 	bac3.position.x, bac3.position.y = 700, 550
 	bac4.position.x, bac4.position.y = 350, 450
 
+	//Angle of cell in radians
+	bac1.angle = 0.4
+	bac2.angle = 0.2
+	bac3.angle = 0.1
+	bac4.angle = 0.4
+
 	bac1.width, bac1.length = 20, 50
 	bac2.width, bac2.length = 10, 40
 	bac3.width, bac3.length = 20, 50

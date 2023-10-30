@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 )
 
 // SimulateBiofilm() takes as input a Culture object initialCulture, a number of generations parameter numGens, and a time interval timeStep.
@@ -59,4 +60,34 @@ func CopyCell(cell *RodCell) *RodCell {
 	newCell.green = cell.green
 
 	return &newCell
+}
+
+// GetRectPoints takes as input the origin (centre point) of a RodCell and a rotation angle Theta
+// It returns the top left, top right, bottom left, bottom right points of the body rectangle
+func GetRectPoints(center OrderedPair, width, length, theta float64) []OrderedPair {
+	vertices := make([]OrderedPair, 4)
+
+	//Top Left
+	vertices[0].x = center.x - (length/2)*math.Cos(theta) - (width/2)*math.Sin(theta)
+	vertices[0].y = center.y - (length/2)*math.Sin(theta) + (width/2)*math.Cos(theta)
+	//Top Right
+	vertices[1].x = center.x + (length/2)*math.Cos(theta) - (width/2)*math.Sin(theta)
+	vertices[1].y = center.y + (length/2)*math.Sin(theta) + (width/2)*math.Cos(theta)
+	//Bottom Left
+	vertices[2].x = center.x - (length/2)*math.Cos(theta) + (width/2)*math.Sin(theta)
+	vertices[2].y = center.y - (length/2)*math.Sin(theta) - (width/2)*math.Cos(theta)
+	//Bottom Right
+	vertices[3].x = center.x + (length/2)*math.Cos(theta) + (width/2)*math.Sin(theta)
+	vertices[3].y = center.y + (length/2)*math.Sin(theta) - (width/2)*math.Cos(theta)
+
+	return vertices
+}
+
+// GetMidPoint takes as input two OrderedPairs
+// It returns the middle point on a Cartesian plane that is between the two OrderedPairs
+func GetMidPoint(pointOne, pointTwo OrderedPair) OrderedPair {
+	var midPoint OrderedPair
+	midPoint.x = (pointOne.x + pointTwo.x) / 2
+	midPoint.y = (pointOne.y + pointTwo.y) / 2
+	return midPoint
 }

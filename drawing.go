@@ -39,15 +39,38 @@ func DrawToCanvas(culture Culture, canvasWidth int) image.Image {
 		c.SetFillColor(canvas.MakeColor(b.red, b.green, b.blue))
 
 		//Draw each RodCell's central rectangle first
-		topX := (b.position.x / culture.width) * float64(canvasWidth)
-		topY := (b.position.y / culture.width) * float64(canvasWidth)
-		c.ClearRect(int(topX), int(topY), int(topX+b.length), int(topY+b.width))
+		//Apply rotation based on angle of cell, assuming position refers to center of cell
+		/*
+			topX := ((b.position.x - b.length/2) / culture.width) * float64(canvasWidth)
+			topY := ((b.position.y - b.width/2) / culture.width) * float64(canvasWidth)
+			bottomX := ((b.position.x + b.length/2) / culture.width) * float64(canvasWidth)
+			bottomY := ((b.position.y + b.width/2) / culture.width) * float64(canvasWidth)
 
-		//Draw a circle at the ends of the central rectangle
-		//REMEMBER TO ADJUST CIRCLE X/Y POSITION WHEN ROTATING
-		c.Circle(topX, topY+(b.width/2), b.width/2)
-		c.Circle(topX+b.length, topY+(b.width/2), b.width/2)
+			rotateTopX := (topX-b.position.x)*math.Cos(b.angle) - (topY-b.position.y)*math.Sin(b.angle)
+			rotateTopY := (topX-b.position.x)*math.Sin(b.angle) - (topY-b.position.y)*math.Cos(b.angle)
 
+			rotateBottomX := (bottomX-b.position.x)*math.Cos(b.angle) - (bottomY-b.position.y)*math.Sin(b.angle)
+			rotateBottomY := (bottomX-b.position.x)*math.Sin(b.angle) - (bottomY-b.position.y)*math.Cos(b.angle)
+			c.ClearRect(int(rotateTopX+b.position.x), int(rotateTopY+b.position.y), int(rotateBottomX+b.position.x), int(rotateBottomY+b.position.y))
+				c.ClearRect(200, 200, 100, 400)
+				//Draw a circle at the ends of the central rectangle
+				//REMEMBER TO ADJUST CIRCLE X/Y POSITION WHEN ROTATING
+				c.Circle(topX, topY+(b.width/2), b.width/2)
+				c.Circle(topX+b.length, topY+(b.width/2), b.width/2)
+
+		*/
+		//Draw the base rectangle
+		vertices := GetRectPoints(b.position, b.width, b.length, b.angle)
+		c.MoveTo(vertices[0].x, vertices[0].y)
+		c.LineTo(vertices[1].x, vertices[1].y)
+		c.LineTo(vertices[3].x, vertices[3].y)
+		c.LineTo(vertices[2].x, vertices[2].y)
+		c.LineTo(vertices[0].x, vertices[0].y)
+		c.Fill()
+
+		//Draw two circles at the end of the base rectangle
+		c.Circle(GetMidPoint(vertices[0], vertices[2]).x, GetMidPoint(vertices[0], vertices[2]).y, b.width/2)
+		c.Circle(GetMidPoint(vertices[1], vertices[3]).x, GetMidPoint(vertices[1], vertices[3]).y, b.width/2)
 		c.Fill()
 	}
 	// Return the image created
