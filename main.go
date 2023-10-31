@@ -42,8 +42,19 @@ func main() {
 	//Initialize culture
 	initialCulture.cells = []*RodCell{b1p, b2p, b3p, b4p}
 
+	//----------this code is used for testing InitializeCulture function-------
+
+	numCells := 50
+	cultureWidth := 1000.0
+	cellWidth := 20.0
+	maxCellLength := 50.0
+
+	initialCulture2 := InitializeCulture(numCells, cultureWidth, cellWidth, maxCellLength)
+
+	//-------------------------------
+
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture, 500, 5)
+	timePoints := SimulateBiofilm(initialCulture2, 500, 5)
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
 
