@@ -91,3 +91,29 @@ func GetMidPoint(pointOne, pointTwo OrderedPair) OrderedPair {
 	midPoint.y = (pointOne.y + pointTwo.y) / 2
 	return midPoint
 }
+
+// Elongate() is a method of Rodcell that takes as input a length, and the cell will elongate that length
+func (c *RodCell) Elongate(length float64) {
+	cellLength := c.length + length
+	c.length = cellLength
+}
+
+// Divide() is a method of Rodcell as it returns two childen of the parent cell after division
+// two children should have have the sizes as their paretn and same other fields
+func (c *RodCell) Divide() (*RodCell, *RodCell) {
+	child1 := &RodCell{}
+	child2 := &RodCell{}
+	child1.position.x = c.position.x - ((c.width / 2) + ((c.maxLength-c.width)/2)*math.Cos(c.angle))
+	child2.position.x = c.position.x + ((c.width/2)+((c.maxLength-c.width)/2))*math.Cos(c.angle)
+	child1.position.y = c.position.y - ((c.width / 2) + ((c.maxLength-c.width)/2)*math.Sin(c.angle))
+	child2.position.y = c.position.y + ((c.width / 2) + ((c.maxLength-c.width)/2)*math.Sin(c.angle))
+	child1.maxLength, child2.maxLength = c.maxLength, c.maxLength
+	child1.red, child1.green, child1.blue = c.red, c.green, c.green
+	child2.red, child2.green, child2.blue = c.red, c.green, c.green
+	child1.length = (c.length - c.width) / 2
+	child2.length = (c.length - c.width) / 2
+	child1.width, child2.width = c.width, c.width
+	child1.angle, child2.angle = c.angle, c.angle
+	return child1, child2
+
+}
