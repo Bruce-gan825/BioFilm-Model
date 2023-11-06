@@ -25,7 +25,7 @@ func main() {
 	//Angle of cell in radians
 	bac1.angle = 0.4
 	bac2.angle = 0.2
-	bac3.angle = 0.1
+	bac3.angle = 0.52
 	bac4.angle = 0.4
 
 	bac1.width, bac1.length = 20, 50
