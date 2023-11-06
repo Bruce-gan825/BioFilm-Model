@@ -103,7 +103,7 @@ func (c *RodCell) Elongate(length float64) {
 func (c *RodCell) Divide() (*RodCell, *RodCell) {
 	child1 := &RodCell{}
 	child2 := &RodCell{}
-	child1.position.x = c.position.x - ((c.width / 2) + ((c.maxLength-c.width)/2)*math.Cos(c.angle))
+	child1.position.x = c.position.x - ((c.width/2)+((c.maxLength-c.width)/2))*math.Cos(c.angle)
 	child2.position.x = c.position.x + ((c.width/2)+((c.maxLength-c.width)/2))*math.Cos(c.angle)
 	child1.position.y = c.position.y - ((c.width / 2) + ((c.maxLength-c.width)/2)*math.Sin(c.angle))
 	child2.position.y = c.position.y + ((c.width / 2) + ((c.maxLength-c.width)/2)*math.Sin(c.angle))
