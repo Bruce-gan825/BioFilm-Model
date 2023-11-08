@@ -17,6 +17,7 @@ type SphereCell struct {
 	cellID                           int
 	radius                           float64
 	position, velocity, acceleration OrderedPair
+	red, green, blue                 uint8
 }
 
 // OrderedPair contains two float64 fields corresponding to

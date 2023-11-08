@@ -173,3 +173,23 @@ func ShoveOverlapCells(s1, s2 SphereCell) {
 	s2.position.y += overlap * (s1.position.y - s2.position.y) / separation
 
 }
+
+// CopySphereCell returns a different cell that has same fields as the input cell
+func CopySphereCell(cell *SphereCell) *SphereCell {
+	//newCell := &RodCell{}
+	var newCell SphereCell
+	newCell.position.x = cell.position.x
+	newCell.position.y = cell.position.y
+	newCell.velocity.x = cell.velocity.x
+	newCell.velocity.y = cell.velocity.y
+	newCell.acceleration.x = cell.acceleration.x
+	newCell.acceleration.y = cell.acceleration.y
+	
+	newCell.cellID = cell.cellID
+	newCell.radius = cell.radius
+	newCell.red = cell.red
+	newCell.blue = cell.blue
+	newCell.green = cell.green
+
+	return &newCell
+}
