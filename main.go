@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"gifhelper"
+	"math/rand"
 )
 
 func main() {
@@ -95,6 +96,27 @@ func main() {
 	//Initialize culture
 	initialCulture.cells = []*SphereCell{s1p, s2p, s3p, s4p}
 
+	//Add an assortment of random cells
+	//Create an initial culture
+	var initialCulture3 Culture
+	initialCulture3.width = 1000
+
+	initialCulture3.cells = make([]*SphereCell, 200)
+	for i := 0; i < 200; i++ {
+		var cell SphereCell
+		cell.cellID = i + 1
+		cell.radius = 8
+
+		//generate random position within cultureWidth
+		cell.position.x, cell.position.y = rand.Float64()*1000, rand.Float64()*1000
+		//generate random velocity
+		cell.velocity.x, cell.velocity.y = (-1 + rand.Float64()*2), (-1 + rand.Float64()*2)
+		// generate random rgb
+		cell.red, cell.green, cell.blue = uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256))
+
+		initialCulture3.cells[i] = &cell
+	}
+
 	//----------this code is used for testing InitializeCulture function-------
 
 	/*numCells := 50
@@ -107,12 +129,12 @@ func main() {
 	//-------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture, 100, 5)
+	timePoints := SimulateBiofilm(initialCulture3, 100, 1)
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
 
 	//Animate simulated cultures, create a GIF result
-	images := AnimateSystem(timePoints, 1000, 5)
+	images := AnimateSystem(timePoints, 1000, 1)
 	fmt.Println("Images drawn!")
 	fmt.Println("Generating an animated GIF...")
 	gifhelper.ImagesToGIF(images, "output")
