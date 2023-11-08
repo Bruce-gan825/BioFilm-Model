@@ -1,7 +1,6 @@
 package main
 
-import "math"
-
+/*
 func IsInside(position OrderedPair) bool {
 
 	// if the point falls inside the rectangle part of RodCell
@@ -56,3 +55,4 @@ func RotatedRectangleCenter(rodcell RodCell) OrderedPair {
 
 	return OrderedPair{X: rotatedCenterX, Y: rotatedCenterY}
 }
+*/
