@@ -118,6 +118,11 @@ func (c *RodCell) Divide() (*RodCell, *RodCell) {
 
 }
 
+// CheckSphereCollision
+func CheckSphereCollision() {
+
+}
+
 // CheckSphereOverlap is a function that takes as input two SphereCell objects.
 // It returns true if the two cells are determined to be overlapping, and false if otherwise.
 func CheckSphereOverlap(s1, s2 SphereCell) bool {
@@ -129,10 +134,26 @@ func CheckSphereOverlap(s1, s2 SphereCell) bool {
 	return false
 }
 
+// GetOverlap is a function that takes as input two SphereCell objects.
+// It returns the amount that two overlapping cells are overlapping by as a float value.
+func GetOverlap(s1, s2 SphereCell) float64 {
+	return Distance(s1.position, s2.position) - s1.radius - s2.radius
+}
+
 // Distance takes two OrderedPairs representing the position of two cells in 2D space.
 // It returns the distance between these two points as a float value
 func Distance(p1, p2 OrderedPair) float64 {
 	deltaX := p1.x - p2.x
 	deltaY := p1.y - p2.y
 	return math.Sqrt(deltaX*deltaX + deltaY*deltaY)
+}
+
+// Shove() is a method of a SphereCell that takes as input another overlapping SphereCell s2
+// It updates the position of the SphereCell by pushing the cell away from the overlapping cell
+func (s SphereCell) Shove(s2 SphereCell) {
+	//Get overlap between the two cells
+	overlap := GetOverlap(s, s2)
+	separation := Distance(s.position, s2.position)
+	s.position.x -= overlap * (s.position.x - s2.position.x) / separation
+	s.position.y -= overlap * (s.position.y - s2.position.y) / separation
 }
