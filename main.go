@@ -105,12 +105,12 @@ func main() {
 	for i := 0; i < 200; i++ {
 		var cell SphereCell
 		cell.cellID = i + 1
-		cell.radius = 8
+		cell.radius = 10
 
 		//generate random position within cultureWidth
 		cell.position.x, cell.position.y = rand.Float64()*1000, rand.Float64()*1000
 		//generate random velocity
-		cell.velocity.x, cell.velocity.y = (-1 + rand.Float64()*2), (-1 + rand.Float64()*2)
+		cell.velocity.x, cell.velocity.y = (-2 + rand.Float64()*4), (-2 + rand.Float64()*4)
 		// generate random rgb
 		cell.red, cell.green, cell.blue = uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256))
 
@@ -129,7 +129,7 @@ func main() {
 	//-------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture3, 100, 1)
+	timePoints := SimulateBiofilm(initialCulture3, 500, 1)
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
 
