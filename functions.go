@@ -117,3 +117,22 @@ func (c *RodCell) Divide() (*RodCell, *RodCell) {
 	return child1, child2
 
 }
+
+// CheckSphereOverlap is a function that takes as input two SphereCell objects.
+// It returns true if the two cells are determined to be overlapping, and false if otherwise.
+func CheckSphereOverlap(s1, s2 SphereCell) bool {
+	//Mathematically, if the distance between the two cells exceeds 2*radius of a cell
+	//Two spherical cells would be in contact
+	if Distance(s1.position, s2.position) > (s1.radius + s2.radius) {
+		return true
+	}
+	return false
+}
+
+// Distance takes two OrderedPairs representing the position of two cells in 2D space.
+// It returns the distance between these two points as a float value
+func Distance(p1, p2 OrderedPair) float64 {
+	deltaX := p1.x - p2.x
+	deltaY := p1.y - p2.y
+	return math.Sqrt(deltaX*deltaX + deltaY*deltaY)
+}
