@@ -33,20 +33,26 @@ func main() {
 	bac3.width, bac3.length = 20, 50
 	bac4.width, bac4.length = 15, 45
 
+<<<<<<< Updated upstream
 	//set maxLength
 	bac1.maxLength = 120
 	bac2.maxLength = 110
 	bac3.maxLength = 120
 	bac4.maxLength = 115
+=======
+	//Test elongate
+	bac1.Elongate(400)
+	bac5, bac6 := bac1.Divide()
+>>>>>>> Stashed changes
 
 	//Take pointers for each cell
-	b1p := &bac1
+	//b1p := &bac1
 	b2p := &bac2
 	b3p := &bac3
 	b4p := &bac4
 
 	//Initialize culture
-	initialCulture.cells = []*RodCell{b1p, b2p, b3p, b4p}
+	initialCulture.cells = []*RodCell{b2p, b3p, b4p, bac5, bac6}
 
 	//----------this code is used for testing InitializeCulture function-------
 
