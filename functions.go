@@ -37,9 +37,11 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 // CopyCulture returns a different culture that has same cells as the input culture
 func CopyCulture(culture Culture) Culture {
 	var newCulture Culture
-	newCulture.cells = make([]*RodCell, len(culture.cells))
+	//newCulture.cells = make([]*RodCell, len(culture.cells))
+	newCulture.cells = make([]*SphereCell, len(culture.cells))
 	for i := range newCulture.cells {
-		newCulture.cells[i] = CopyCell(culture.cells[i])
+		//newCulture.cells[i] = CopyCell(culture.cells[i])
+		newCulture.cells[i] = CopySphereCell(culture.cells[i])
 	}
 	newCulture.width = culture.width
 	return newCulture
@@ -184,7 +186,7 @@ func CopySphereCell(cell *SphereCell) *SphereCell {
 	newCell.velocity.y = cell.velocity.y
 	newCell.acceleration.x = cell.acceleration.x
 	newCell.acceleration.y = cell.acceleration.y
-	
+
 	newCell.cellID = cell.cellID
 	newCell.radius = cell.radius
 	newCell.red = cell.red

@@ -1,12 +1,9 @@
 package main
 
-import (
-	"math/rand"
-)
-
 // InitializeCulture takes as imput the number of cells, culture width, cell width and cell maxlength
 // Returns a Culture object with numCells having random colors, length (< maxlength), angle, and position (within culture width)
 // Culture width, cellWidth and and cellMaxLength are set values (not random)
+/*
 func InitializeCulture(numCells int, cultureWidth, cellWidth, cellMaxLength float64) Culture {
 	var cture Culture
 	cture.width = cultureWidth
@@ -30,3 +27,5 @@ func InitializeCulture(numCells int, cultureWidth, cellWidth, cellMaxLength floa
 	}
 	return cture
 } //needs further update to have cells not overlay on top of each other
+
+*/

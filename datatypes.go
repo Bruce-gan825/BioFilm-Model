@@ -28,7 +28,8 @@ type OrderedPair struct {
 
 // Culture represents all the cells in the biofilm at the time.
 type Culture struct {
-	cells []*RodCell
+	//cells []*RodCell
+	cells []*SphereCell
 
 	//Width represents the width of the "canvas" where cells grow
 	width float64

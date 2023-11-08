@@ -59,18 +59,27 @@ func DrawToCanvas(culture Culture, canvasWidth int) image.Image {
 				c.Circle(topX+b.length, topY+(b.width/2), b.width/2)
 
 		*/
-		//Draw the base rectangle
-		vertices := GetRectPoints(b.position, b.width, b.length, b.angle)
-		c.MoveTo(vertices[0].x, vertices[0].y)
-		c.LineTo(vertices[1].x, vertices[1].y)
-		c.LineTo(vertices[3].x, vertices[3].y)
-		c.LineTo(vertices[2].x, vertices[2].y)
-		c.LineTo(vertices[0].x, vertices[0].y)
-		c.Fill()
+		//Draw the base circles
+		centreX := (b.position.x / culture.width) * float64(canvasWidth)
+		centreY := (b.position.y / culture.width) * float64(canvasWidth)
+		r := (b.radius / culture.width) * float64(canvasWidth)
+		c.Circle(centreX, centreY, r)
 
-		//Draw two circles at the end of the base rectangle
-		c.Circle(GetMidPoint(vertices[0], vertices[2]).x, GetMidPoint(vertices[0], vertices[2]).y, b.width/2)
-		c.Circle(GetMidPoint(vertices[1], vertices[3]).x, GetMidPoint(vertices[1], vertices[3]).y, b.width/2)
+		/*
+			//Draw the base rectangle
+			vertices := GetRectPoints(b.position, b.width, b.length, b.angle)
+			c.MoveTo(vertices[0].x, vertices[0].y)
+			c.LineTo(vertices[1].x, vertices[1].y)
+			c.LineTo(vertices[3].x, vertices[3].y)
+			c.LineTo(vertices[2].x, vertices[2].y)
+			c.LineTo(vertices[0].x, vertices[0].y)
+			c.Fill()
+
+			//Draw two circles at the end of the base rectangle
+			c.Circle(GetMidPoint(vertices[0], vertices[2]).x, GetMidPoint(vertices[0], vertices[2]).y, b.width/2)
+			c.Circle(GetMidPoint(vertices[1], vertices[3]).x, GetMidPoint(vertices[1], vertices[3]).y, b.width/2)
+		*/
+
 		c.Fill()
 
 	}
