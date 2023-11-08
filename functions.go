@@ -157,3 +157,19 @@ func (s SphereCell) Shove(s2 SphereCell) {
 	s.position.x -= overlap * (s.position.x - s2.position.x) / separation
 	s.position.y -= overlap * (s.position.y - s2.position.y) / separation
 }
+
+// ShoveOverlapCells is a function that takes as input two SphereCell objects
+// If the two cells are overlapping, the cells will be shoved apart at an angle
+// directly opposite to the point of contact.
+func ShoveOverlapCells(s1, s2 SphereCell) {
+	//IMPORTANT, order of updating position matters
+	//Must first update the "original" cell s1
+	overlap := GetOverlap(s1, s2)
+	separation := Distance(s1.position, s2.position)
+	s1.position.x -= overlap * (s1.position.x - s2.position.x) / separation
+	s1.position.y -= overlap * (s1.position.y - s2.position.y) / separation
+
+	s2.position.x += overlap * (s1.position.x - s2.position.x) / separation
+	s2.position.y += overlap * (s1.position.y - s2.position.y) / separation
+
+}
