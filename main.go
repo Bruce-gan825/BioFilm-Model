@@ -18,7 +18,7 @@ func main() {
 	bac4.red, bac4.green, bac4.blue = 240, 240, 100
 
 	bac1.position.x, bac1.position.y = 400, 400
-	bac2.position.x, bac2.position.y = 600, 600
+	bac2.position.x, bac2.position.y = 600, 100
 	bac3.position.x, bac3.position.y = 700, 550
 	bac4.position.x, bac4.position.y = 350, 450
 
@@ -64,7 +64,7 @@ func main() {
 	//-------------------------------
 
 	//Test Run BioFilm-Model simulation
-	/*timePoints := SimulateBiofilm(initialCulture, 500, 5)
+	timePoints := SimulateBiofilm(initialCulture, 500, 5)
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
 
@@ -74,7 +74,7 @@ func main() {
 	fmt.Println("Generating an animated GIF...")
 	gifhelper.ImagesToGIF(images, "output")
 	fmt.Println("GIF Drawn!")
-	fmt.Println("Simulation Complete!")*/
+	fmt.Println("Simulation Complete!")
 
 	//Test Elongate
 	/*timePoints := SimulateBiofilm(initialCulture, 0, 5)
@@ -89,17 +89,19 @@ func main() {
 	fmt.Println("Simulation Complete!")*/
 
 	//Test Divide
-	timePoints := SimulateBiofilm(initialCulture, 0, 5)
-	fmt.Println("Simulation Complete")
-	fmt.Println("Drawing cultures...")
-	timePoints[0].cells[0].Elongate(50)
-	children := make([]*RodCell, 2)
-	children[0], children[1] = timePoints[0].cells[0].Divide()
-	timePoints[0].cells = append(timePoints[0].cells[1:], children...)
-	images := AnimateSystem(timePoints, 1000, 1)
-	fmt.Println("Images drawn!")
-	fmt.Println("Generating an animated GIF...")
-	gifhelper.ImagesToGIF(images, "Divide")
-	fmt.Println("GIF Drawn!")
-	fmt.Println("Simulation Complete!")
+	/*
+		timePoints := SimulateBiofilm(initialCulture, 0, 5)
+		fmt.Println("Simulation Complete")
+		fmt.Println("Drawing cultures...")
+		timePoints[0].cells[0].Elongate(50)
+		children := make([]*RodCell, 2)
+		children[0], children[1] = timePoints[0].cells[0].Divide()
+		timePoints[0].cells = append(timePoints[0].cells[1:], children...)
+		images := AnimateSystem(timePoints, 1000, 1)
+		fmt.Println("Images drawn!")
+		fmt.Println("Generating an animated GIF...")
+		gifhelper.ImagesToGIF(images, "Divide")
+		fmt.Println("GIF Drawn!")
+		fmt.Println("Simulation Complete!")
+	*/
 }

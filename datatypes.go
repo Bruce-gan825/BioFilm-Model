@@ -9,6 +9,16 @@ type RodCell struct {
 	position                        OrderedPair
 }
 
+// SphereCell represents a single spherical bacterial cell. It contains fields representing the movement of
+// a single cell in 2D space such as position, velocity, acceleration. It also contains the radius of the cell
+// necessary for drawing and collision detection. It also contains a cellID that will allow certain "clusters" of
+// spherical cells to form and communicate.
+type SphereCell struct {
+	cellID                           int
+	radius                           float64
+	position, velocity, acceleration OrderedPair
+}
+
 // OrderedPair contains two float64 fields corresponding to
 // the x and y coordinates of a point or vector in two-dimensional space.
 type OrderedPair struct {

@@ -72,6 +72,7 @@ func DrawToCanvas(culture Culture, canvasWidth int) image.Image {
 		c.Circle(GetMidPoint(vertices[0], vertices[2]).x, GetMidPoint(vertices[0], vertices[2]).y, b.width/2)
 		c.Circle(GetMidPoint(vertices[1], vertices[3]).x, GetMidPoint(vertices[1], vertices[3]).y, b.width/2)
 		c.Fill()
+
 	}
 	// Return the image created
 	return c.GetImage()
