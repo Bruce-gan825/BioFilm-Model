@@ -76,10 +76,10 @@ func main() {
 	sta4.cellID = 4
 
 	//Set initial movement of cells
-	sta1.velocity.x, sta1.velocity.y = 50, 50
-	sta2.velocity.x, sta2.velocity.y = -50, -50
-	sta3.velocity.x, sta3.velocity.y = 50, 30
-	sta4.velocity.x, sta4.velocity.y = 30, 50
+	sta1.velocity.x, sta1.velocity.y = 1, 1
+	sta2.velocity.x, sta2.velocity.y = -1, -1
+	sta3.velocity.x, sta3.velocity.y = 1, 1
+	sta4.velocity.x, sta4.velocity.y = 1, 1
 
 	sta1.acceleration.x, sta1.acceleration.y = 0, 0
 	sta2.acceleration.x, sta2.acceleration.y = 0, 0
@@ -107,7 +107,7 @@ func main() {
 	//-------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture, 800, 5)
+	timePoints := SimulateBiofilm(initialCulture, 100, 5)
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
 

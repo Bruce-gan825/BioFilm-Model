@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -26,17 +25,19 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 	//Iterate over all Cells in the newly created Culture and update their fields
 	for i := range newCulture.cells {
 		//Update position functions go here
-		if i > 99999999999999 {
-			fmt.Println("No")
-		}
+		newCulture.cells[i].acceleration = UpdateAcceleration(currentCulture, newCulture.cells[i])
+		newCulture.cells[i].velocity = UpdateVelocity(newCulture.cells[i], time)
+		newCulture.cells[i].position = UpdatePosition(newCulture.cells[i], time)
 	}
+
+	CheckSphereCollision(newCulture)
 
 	return newCulture
 }
 
 // UpdateAcceleration takes as input a Culture object and a particular cell within the Culture
 // It returns the net acceleration due to the net forces that a Cell experiences at a given point in time.
-func UpdateAcceleration(currentCulture Culture, s SphereCell) OrderedPair {
+func UpdateAcceleration(currentCulture Culture, s *SphereCell) OrderedPair {
 	var accel OrderedPair
 	//ADD NET FORCE CALCULATION HERE
 	accel.x = 0
@@ -46,7 +47,7 @@ func UpdateAcceleration(currentCulture Culture, s SphereCell) OrderedPair {
 
 // UpdateVelocity takes as input a Cell object and a float time.
 // It returns the updated velocity of that Cell estimated over time seconds as a result of Newtonian physics
-func UpdateVelocity(s SphereCell, time float64) OrderedPair {
+func UpdateVelocity(s *SphereCell, time float64) OrderedPair {
 	var vel OrderedPair
 	vel.x = s.velocity.x + s.acceleration.x*time
 	vel.y = s.velocity.y + s.acceleration.y*time
@@ -55,7 +56,7 @@ func UpdateVelocity(s SphereCell, time float64) OrderedPair {
 
 // UpdatePosition takes as input a Cell object and a float time.
 // It returns the updated position (in components) of that Cell estimated over time seconds as a result of Newtonian physics
-func UpdatePosition(s SphereCell, time float64) OrderedPair {
+func UpdatePosition(s *SphereCell, time float64) OrderedPair {
 	var pos OrderedPair
 	pos.x = s.position.x + s.velocity.x*time + 0.5*s.acceleration.x*time*time
 	pos.y = s.position.y + s.velocity.y*time + 0.5*s.acceleration.y*time*time
@@ -148,17 +149,32 @@ func (c *RodCell) Divide() (*RodCell, *RodCell) {
 
 }
 
-// CheckSphereCollision
-func CheckSphereCollision() {
+// CheckSphereCollision is a function that takes as input a culture of spherical cells
+// It iterates over every pair of cells within the culture and performs collision detection
+func CheckSphereCollision(newCulture Culture) {
+	for i := 0; i < len(newCulture.cells); i++ {
+		for j := 0; j < len(newCulture.cells); j++ {
+			//Check if cells to collide are not the original cell
+			if newCulture.cells[i].cellID != newCulture.cells[j].cellID {
 
+				//Check if cells overlap
+				if CheckSphereOverlap(newCulture.cells[i], newCulture.cells[j]) {
+					//If cells do overlap, shove both cells
+					ShoveOverlapCells(newCulture.cells[i], newCulture.cells[j])
+					newCulture.cells[i].red, newCulture.cells[i].green, newCulture.cells[i].blue = 255, 255, 255
+					newCulture.cells[j].red, newCulture.cells[j].green, newCulture.cells[j].blue = 255, 255, 255
+				}
+			}
+		}
+	}
 }
 
 // CheckSphereOverlap is a function that takes as input two SphereCell objects.
 // It returns true if the two cells are determined to be overlapping, and false if otherwise.
-func CheckSphereOverlap(s1, s2 SphereCell) bool {
+func CheckSphereOverlap(s1, s2 *SphereCell) bool {
 	//Mathematically, if the distance between the two cells exceeds 2*radius of a cell
 	//Two spherical cells would be in contact
-	if Distance(s1.position, s2.position) > (s1.radius + s2.radius) {
+	if Distance(s1.position, s2.position) < (s1.radius + s2.radius) {
 		return true
 	}
 	return false
@@ -166,7 +182,7 @@ func CheckSphereOverlap(s1, s2 SphereCell) bool {
 
 // GetOverlap is a function that takes as input two SphereCell objects.
 // It returns the amount that two overlapping cells are overlapping by as a float value.
-func GetOverlap(s1, s2 SphereCell) float64 {
+func GetOverlap(s1, s2 *SphereCell) float64 {
 	return Distance(s1.position, s2.position) - s1.radius - s2.radius
 }
 
@@ -180,7 +196,7 @@ func Distance(p1, p2 OrderedPair) float64 {
 
 // Shove() is a method of a SphereCell that takes as input another overlapping SphereCell s2
 // It updates the position of the SphereCell by pushing the cell away from the overlapping cell
-func (s SphereCell) Shove(s2 SphereCell) {
+func (s *SphereCell) Shove(s2 *SphereCell) {
 	//Get overlap between the two cells
 	overlap := GetOverlap(s, s2)
 	separation := Distance(s.position, s2.position)
@@ -191,10 +207,10 @@ func (s SphereCell) Shove(s2 SphereCell) {
 // ShoveOverlapCells is a function that takes as input two SphereCell objects
 // If the two cells are overlapping, the cells will be shoved apart at an angle
 // directly opposite to the point of contact.
-func ShoveOverlapCells(s1, s2 SphereCell) {
+func ShoveOverlapCells(s1, s2 *SphereCell) {
 	//IMPORTANT, order of updating position matters
 	//Must first update the "original" cell s1
-	overlap := GetOverlap(s1, s2)
+	overlap := 0.5 * GetOverlap(s1, s2)
 	separation := Distance(s1.position, s2.position)
 	s1.position.x -= overlap * (s1.position.x - s2.position.x) / separation
 	s1.position.y -= overlap * (s1.position.y - s2.position.y) / separation
