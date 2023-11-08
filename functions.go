@@ -34,6 +34,34 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 	return newCulture
 }
 
+// UpdateAcceleration takes as input a Culture object and a particular cell within the Culture
+// It returns the net acceleration due to the net forces that a Cell experiences at a given point in time.
+func UpdateAcceleration(currentCulture Culture, s SphereCell) OrderedPair {
+	var accel OrderedPair
+	//ADD NET FORCE CALCULATION HERE
+	accel.x = 0
+	accel.y = 0
+	return accel
+}
+
+// UpdateVelocity takes as input a Cell object and a float time.
+// It returns the updated velocity of that Cell estimated over time seconds as a result of Newtonian physics
+func UpdateVelocity(s SphereCell, time float64) OrderedPair {
+	var vel OrderedPair
+	vel.x = s.velocity.x + s.acceleration.x*time
+	vel.y = s.velocity.y + s.acceleration.y*time
+	return vel
+}
+
+// UpdatePosition takes as input a Cell object and a float time.
+// It returns the updated position (in components) of that Cell estimated over time seconds as a result of Newtonian physics
+func UpdatePosition(s SphereCell, time float64) OrderedPair {
+	var pos OrderedPair
+	pos.x = s.position.x + s.velocity.x*time + 0.5*s.acceleration.x*time*time
+	pos.y = s.position.y + s.velocity.y*time + 0.5*s.acceleration.y*time*time
+	return pos
+}
+
 // CopyCulture returns a different culture that has same cells as the input culture
 func CopyCulture(culture Culture) Culture {
 	var newCulture Culture
