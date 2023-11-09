@@ -30,6 +30,7 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 		newCulture.cells[i].position = UpdatePosition(newCulture.cells[i], time)
 	}
 
+	//Apply simple collision function for the newCulture
 	CheckSphereCollision(newCulture)
 
 	return newCulture
