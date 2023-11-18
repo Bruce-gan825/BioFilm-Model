@@ -39,22 +39,13 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 
 		//grow cells
 		newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], growthRate)
-
+		//divide cells if radius is greater than maxRadius
 		if newCulture.cells[i].radius >= maxRadius {
 			child1, child2 := DivideCellSpherical(newCulture.cells[i])
 			newCulture.cells[i] = child1
 			newCulture.cells = append(newCulture.cells, child2)
 		}
 	}
-
-	// for i := range newCulture.cells {
-	// 	if newCulture.cells[i].radius >= maxRadius {
-	// 		child1, child2 := DivideCellSpherical(newCulture.cells[i])
-	// 		newCulture.cells[i] = child1
-	// 		newCulture.cells = append(newCulture.cells, child2)
-	// 	}
-
-	// }
 
 	//Apply simple collision function for the newCulture
 	CheckSphereCollision(newCulture)
