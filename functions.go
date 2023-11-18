@@ -1,7 +1,10 @@
 package main
 
+//THETA IS IN RADIANS (0 - 2 Pi)
+
 import (
 	"math"
+	"math/rand"
 )
 
 // SimulateBiofilm() takes as input a Culture object initialCulture, a number of generations parameter numGens, and a time interval timeStep.
@@ -22,18 +25,66 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 	//Create a copy of the current culture to alter
 	newCulture := CopyCulture(currentCulture)
 
+	//growthRate is a constant that determines how much cells grow per time interval
+	// 0.1 = 10% growth per time interval
+	growthRate := 0.03
+	maxRadius := 20.0
+
 	//Iterate over all Cells in the newly created Culture and update their fields
 	for i := range newCulture.cells {
 		//Update position functions go here
 		newCulture.cells[i].acceleration = UpdateAcceleration(currentCulture, newCulture.cells[i])
 		newCulture.cells[i].velocity = UpdateVelocity(newCulture.cells[i], time)
 		newCulture.cells[i].position = UpdatePosition(newCulture.cells[i], time)
+
+		//grow cells
+		newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], growthRate)
+
+		if newCulture.cells[i].radius >= maxRadius {
+			child1, child2 := DivideCellSpherical(newCulture.cells[i])
+			newCulture.cells[i] = child1
+			newCulture.cells = append(newCulture.cells, child2)
+		}
 	}
+
+	// for i := range newCulture.cells {
+	// 	if newCulture.cells[i].radius >= maxRadius {
+	// 		child1, child2 := DivideCellSpherical(newCulture.cells[i])
+	// 		newCulture.cells[i] = child1
+	// 		newCulture.cells = append(newCulture.cells, child2)
+	// 	}
+
+	// }
 
 	//Apply simple collision function for the newCulture
 	CheckSphereCollision(newCulture)
 
 	return newCulture
+
+}
+
+func DivideCellSpherical(s *SphereCell) (*SphereCell, *SphereCell) {
+	theta := rand.Float64() * 2 * math.Pi
+	child1 := &SphereCell{}
+	child2 := &SphereCell{}
+	child1.position.x = (s.position.x + s.radius*math.Cos(theta)/2)
+	child2.position.x = (s.position.x + s.radius*math.Cos(theta-math.Pi)/2)
+	child1.position.y = (s.position.y + s.radius*math.Sin(theta)/2)
+	child2.position.y = (s.position.y + s.radius*math.Sin(theta-math.Pi)/2)
+	child1.radius, child2.radius = s.radius/2, s.radius/2
+	child1.red, child1.green, child1.blue = s.red, s.green, s.blue
+	child2.red, child2.green, child2.blue = s.red, s.green, s.blue
+	child1.velocity.x, child1.velocity.y = s.velocity.x, s.velocity.y
+	child2.velocity.x, child2.velocity.y = s.velocity.x, s.velocity.y
+	child1.acceleration.x, child1.acceleration.y = s.acceleration.x, s.acceleration.y
+	child2.acceleration.x, child2.acceleration.y = s.acceleration.x, s.acceleration.y
+	child1.cellID = s.cellID
+	child2.cellID = rand.Intn(1000000)
+	return child1, child2
+}
+
+func GrowCellSpherical(s *SphereCell, growthRate float64) float64 {
+	return s.radius + growthRate*s.radius
 }
 
 // UpdateAcceleration takes as input a Culture object and a particular cell within the Culture
@@ -162,8 +213,8 @@ func CheckSphereCollision(newCulture Culture) {
 				if CheckSphereOverlap(newCulture.cells[i], newCulture.cells[j]) {
 					//If cells do overlap, shove both cells
 					ShoveOverlapCells(newCulture.cells[i], newCulture.cells[j])
-					newCulture.cells[i].red, newCulture.cells[i].green, newCulture.cells[i].blue = 255, 255, 255
-					newCulture.cells[j].red, newCulture.cells[j].green, newCulture.cells[j].blue = 255, 255, 255
+					//newCulture.cells[i].red, newCulture.cells[i].green, newCulture.cells[i].blue = 255, 255, 255
+					//newCulture.cells[j].red, newCulture.cells[j].green, newCulture.cells[j].blue = 255, 255, 255
 				}
 			}
 		}
@@ -195,15 +246,16 @@ func Distance(p1, p2 OrderedPair) float64 {
 	return math.Sqrt(deltaX*deltaX + deltaY*deltaY)
 }
 
+//--- this function is not called anywhere in the code ---
 // Shove() is a method of a SphereCell that takes as input another overlapping SphereCell s2
 // It updates the position of the SphereCell by pushing the cell away from the overlapping cell
-func (s *SphereCell) Shove(s2 *SphereCell) {
-	//Get overlap between the two cells
-	overlap := GetOverlap(s, s2)
-	separation := Distance(s.position, s2.position)
-	s.position.x -= overlap * (s.position.x - s2.position.x) / separation
-	s.position.y -= overlap * (s.position.y - s2.position.y) / separation
-}
+// func (s *SphereCell) Shove(s2 *SphereCell) {
+// 	//Get overlap between the two cells
+// 	overlap := GetOverlap(s, s2)
+// 	separation := Distance(s.position, s2.position)
+// 	s.position.x -= overlap * (s.position.x - s2.position.x) / separation
+// 	s.position.y -= overlap * (s.position.y - s2.position.y) / separation
+// }
 
 // ShoveOverlapCells is a function that takes as input two SphereCell objects
 // If the two cells are overlapping, the cells will be shoved apart at an angle

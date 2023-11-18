@@ -70,17 +70,17 @@ func main() {
 	sta4.position.x, sta4.position.y = 350, 450
 
 	//Radius of spherical cells
-	sta1.radius, sta2.radius, sta3.radius, sta4.radius = 50, 50, 50, 50
+	sta1.radius, sta2.radius, sta3.radius, sta4.radius = 25, 10, 5, 11
 	sta1.cellID = 1
 	sta2.cellID = 2
 	sta3.cellID = 3
 	sta4.cellID = 4
 
 	//Set initial movement of cells
-	sta1.velocity.x, sta1.velocity.y = 1, 1
-	sta2.velocity.x, sta2.velocity.y = -1, -1
-	sta3.velocity.x, sta3.velocity.y = 1, 1
-	sta4.velocity.x, sta4.velocity.y = 1, 1
+	sta1.velocity.x, sta1.velocity.y = 0, 0
+	sta2.velocity.x, sta2.velocity.y = -0.1, -0.1
+	sta3.velocity.x, sta3.velocity.y = 0.1, 0.1
+	sta4.velocity.x, sta4.velocity.y = 0.1, 0.1
 
 	sta1.acceleration.x, sta1.acceleration.y = 0, 0
 	sta2.acceleration.x, sta2.acceleration.y = 0, 0
@@ -129,7 +129,8 @@ func main() {
 	//-------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture3, 500, 1)
+	timePoints := SimulateBiofilm(initialCulture3, 100, 1)
+
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
 
