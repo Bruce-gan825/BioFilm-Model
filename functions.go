@@ -27,11 +27,11 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 
 	//growthRate is a constant that determines how much cells grow per time interval
 	// 0.1 = 10% growth per time interval
-	growthRate := 0.03
+	growthRate := 0.04
 	//maxRadius is a constant that determines the maximum radius a cell can grow to before dividing
 	maxRadius := 20.0
-
-	cellGrowthNutritionThreshold := 0.1
+	//cellGrowthNutritionThreshold is a constant that determines the minimum amount of nutrition a cell must have before it can grow
+	cellGrowthNutritionThreshold := 0.8
 
 	//Iterate over all Cells in the newly created Culture and update their fields
 	for i := range newCulture.cells {
@@ -40,9 +40,10 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 		newCulture.cells[i].velocity = UpdateVelocity(newCulture.cells[i], time)
 		newCulture.cells[i].position = UpdatePosition(newCulture.cells[i], time)
 
-		//Update cellNutrition and nutrition board
+		//Update cellNutrition according to nutritions on board and cell's position
+		//Also update the nutrition level on board after it's consumed by the cell
 		newCulture.cells[i].cellNutrition = ConsumeNutrients(newCulture.nutrition, newCulture.cells[i])
-		//fmt.Println(newCulture.cells[i].cellNutrition)
+
 		//grow cells if cell's nutrition level is greater than threshold
 		if float64(newCulture.cells[i].cellNutrition) >= cellGrowthNutritionThreshold {
 			newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], growthRate)
@@ -50,8 +51,8 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 		//divide cells if radius is greater than maxRadius
 		if newCulture.cells[i].radius >= maxRadius {
 			child1, child2 := DivideCellSpherical(newCulture.cells[i])
-			newCulture.cells[i] = child1
-			newCulture.cells = append(newCulture.cells, child2)
+			newCulture.cells[i] = child1                        //replace original cell with child1
+			newCulture.cells = append(newCulture.cells, child2) //append child2 to culture
 		}
 	}
 
@@ -62,9 +63,16 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 
 }
 
+// ConsumeNutrients takes as input a nutrition board and a SphereCell object
+// It returns the updated cellNutrition of the SphereCell object after consuming nutrients
+// And updates the nutrition board accordingly
 func ConsumeNutrients(nutritionBoard [][]int, s *SphereCell) int {
-	cellNutrient := s.cellNutrition
+	//Note: the cell is treated as a square (width 2*radius) for the purposes of nutrient consumption
 
+	cellNutrient := s.cellNutrition //current cellNutrition
+
+	//Iterate over the nutrition board and check if cell is in contact with any nutrition
+	//If so, cellNutrition increases by 1 and nutrition level decreases by 1
 	xstart := int(s.position.x - s.radius)
 	xend := int(s.position.x + s.radius)
 	ystart := int(s.position.y - s.radius)
@@ -72,9 +80,7 @@ func ConsumeNutrients(nutritionBoard [][]int, s *SphereCell) int {
 
 	for i := xstart; i < xend; i++ {
 		for j := ystart; j < yend; j++ {
-
 			if inBounds(i, j, len(nutritionBoard)) && nutritionBoard[i][j] > 0 {
-
 				cellNutrient++
 				nutritionBoard[i][j]--
 			}
@@ -84,11 +90,15 @@ func ConsumeNutrients(nutritionBoard [][]int, s *SphereCell) int {
 
 }
 
+// inBounds checks if a given x and y coordinate is within the bounds of a square board of width width
+// It returns true if the x and y coordinate is within the bounds of the board, and false if otherwise
 func inBounds(x, y, width int) bool {
-
 	return x >= 0 && x < width && y >= 0 && y < width
 }
 
+// DivideCellSpherical takes as input a SphereCell object and returns two SphereCell objects
+// children cells inherit same parameters of parent cell except for position and cellID (for second child)
+// where the children cells are placed in random positions in the vicinity of the parent cell
 func DivideCellSpherical(s *SphereCell) (*SphereCell, *SphereCell) {
 	theta := rand.Float64() * 2 * math.Pi
 	child1 := &SphereCell{}
@@ -109,6 +119,8 @@ func DivideCellSpherical(s *SphereCell) (*SphereCell, *SphereCell) {
 	return child1, child2
 }
 
+// GrowCellSpherical takes as input a SphereCell object and a growthRate float64 parameter
+// It returns the updated radius of the SphereCell object after growing by growthRate
 func GrowCellSpherical(s *SphereCell, growthRate float64) float64 {
 	return s.radius + growthRate*s.radius
 }
@@ -157,6 +169,7 @@ func CopyCulture(culture Culture) Culture {
 	return newCulture
 }
 
+// CopyNutritionBoard returns a new nutrition board that has same values as the input nutrition board
 func CopyNutritionBoard(nutritionBoard [][]int) [][]int {
 	newNutritionBoard := make([][]int, len(nutritionBoard))
 	for i := range newNutritionBoard {

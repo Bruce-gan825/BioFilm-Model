@@ -33,6 +33,8 @@ type Culture struct {
 	cells []*SphereCell
 
 	//Width represents the width of the "canvas" where cells grow
-	width     float64
+	width float64
+
+	//nutrition represents the nutrition board of the culture
 	nutrition [][]int
 }

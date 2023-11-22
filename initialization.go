@@ -30,6 +30,8 @@ func InitializeCulture(numCells int, cultureWidth, cellWidth, cellMaxLength floa
 
 */
 
+// MakeNutritionBoard takes as input the width of the culture and the nutrition value
+// Returns a 2D slice of ints representing the nutrition board of the culture
 func MakeNutritionBoard(width int, nutritionValue int) [][]int {
 
 	rows := make([][]int, width)

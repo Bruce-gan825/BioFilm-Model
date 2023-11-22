@@ -124,6 +124,7 @@ func main() {
 
 		initialCulture3.cells[i] = &cell
 	}
+	initialCulture3.nutrition = nutrition
 
 	//----------this code is used for testing InitializeCulture function-------
 
@@ -137,7 +138,7 @@ func main() {
 	//-------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture, 400, 1)
+	timePoints := SimulateBiofilm(initialCulture3, 200, 1)
 
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
