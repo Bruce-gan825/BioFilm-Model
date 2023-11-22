@@ -18,6 +18,7 @@ type SphereCell struct {
 	radius                           float64
 	position, velocity, acceleration OrderedPair
 	red, green, blue                 uint8
+	cellNutrition                    int
 }
 
 // OrderedPair contains two float64 fields corresponding to
@@ -32,5 +33,6 @@ type Culture struct {
 	cells []*SphereCell
 
 	//Width represents the width of the "canvas" where cells grow
-	width float64
+	width     float64
+	nutrition [][]int
 }

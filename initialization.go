@@ -29,3 +29,17 @@ func InitializeCulture(numCells int, cultureWidth, cellWidth, cellMaxLength floa
 } //needs further update to have cells not overlay on top of each other
 
 */
+
+func MakeNutritionBoard(width int, nutritionValue int) [][]int {
+
+	rows := make([][]int, width)
+
+	for i := range rows {
+		rows[i] = make([]int, width)
+
+		for j := range rows[i] {
+			rows[i][j] = nutritionValue
+		}
+	}
+	return rows
+}

@@ -28,7 +28,10 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 	//growthRate is a constant that determines how much cells grow per time interval
 	// 0.1 = 10% growth per time interval
 	growthRate := 0.03
+	//maxRadius is a constant that determines the maximum radius a cell can grow to before dividing
 	maxRadius := 20.0
+
+	cellGrowthNutritionThreshold := 0.1
 
 	//Iterate over all Cells in the newly created Culture and update their fields
 	for i := range newCulture.cells {
@@ -37,8 +40,13 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 		newCulture.cells[i].velocity = UpdateVelocity(newCulture.cells[i], time)
 		newCulture.cells[i].position = UpdatePosition(newCulture.cells[i], time)
 
-		//grow cells
-		newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], growthRate)
+		//Update cellNutrition and nutrition board
+		newCulture.cells[i].cellNutrition = ConsumeNutrients(newCulture.nutrition, newCulture.cells[i])
+		//fmt.Println(newCulture.cells[i].cellNutrition)
+		//grow cells if cell's nutrition level is greater than threshold
+		if float64(newCulture.cells[i].cellNutrition) >= cellGrowthNutritionThreshold {
+			newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], growthRate)
+		}
 		//divide cells if radius is greater than maxRadius
 		if newCulture.cells[i].radius >= maxRadius {
 			child1, child2 := DivideCellSpherical(newCulture.cells[i])
@@ -52,6 +60,33 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 
 	return newCulture
 
+}
+
+func ConsumeNutrients(nutritionBoard [][]int, s *SphereCell) int {
+	cellNutrient := s.cellNutrition
+
+	xstart := int(s.position.x - s.radius)
+	xend := int(s.position.x + s.radius)
+	ystart := int(s.position.y - s.radius)
+	yend := int(s.position.y + s.radius)
+
+	for i := xstart; i < xend; i++ {
+		for j := ystart; j < yend; j++ {
+
+			if inBounds(i, j, len(nutritionBoard)) && nutritionBoard[i][j] > 0 {
+
+				cellNutrient++
+				nutritionBoard[i][j]--
+			}
+		}
+	}
+	return cellNutrient
+
+}
+
+func inBounds(x, y, width int) bool {
+
+	return x >= 0 && x < width && y >= 0 && y < width
 }
 
 func DivideCellSpherical(s *SphereCell) (*SphereCell, *SphereCell) {
@@ -115,81 +150,22 @@ func CopyCulture(culture Culture) Culture {
 		//newCulture.cells[i] = CopyCell(culture.cells[i])
 		newCulture.cells[i] = CopySphereCell(culture.cells[i])
 	}
+	//copy nutrition board
+	newCulture.nutrition = CopyNutritionBoard(culture.nutrition)
+
 	newCulture.width = culture.width
 	return newCulture
 }
 
-// CopyCell returns a different cell that has same fields as the input cell
-func CopyCell(cell *RodCell) *RodCell {
-	//newCell := &RodCell{}
-	var newCell RodCell
-	newCell.length = cell.length
-	newCell.maxLength = cell.maxLength
-	newCell.width = cell.width
-	newCell.angle = cell.angle
-	newCell.position.x = cell.position.x
-	newCell.position.y = cell.position.y
-	newCell.red = cell.red
-	newCell.blue = cell.blue
-	newCell.green = cell.green
-
-	return &newCell
-}
-
-// GetRectPoints takes as input the origin (centre point) of a RodCell and a rotation angle Theta
-// It returns the top left, top right, bottom left, bottom right points of the body rectangle
-func GetRectPoints(center OrderedPair, width, length, theta float64) []OrderedPair {
-	vertices := make([]OrderedPair, 4)
-
-	//Top Left
-	vertices[0].x = center.x - (length/2)*math.Cos(theta) - (width/2)*math.Sin(theta)
-	vertices[0].y = center.y - (length/2)*math.Sin(theta) + (width/2)*math.Cos(theta)
-	//Top Right
-	vertices[1].x = center.x + (length/2)*math.Cos(theta) - (width/2)*math.Sin(theta)
-	vertices[1].y = center.y + (length/2)*math.Sin(theta) + (width/2)*math.Cos(theta)
-	//Bottom Left
-	vertices[2].x = center.x - (length/2)*math.Cos(theta) + (width/2)*math.Sin(theta)
-	vertices[2].y = center.y - (length/2)*math.Sin(theta) - (width/2)*math.Cos(theta)
-	//Bottom Right
-	vertices[3].x = center.x + (length/2)*math.Cos(theta) + (width/2)*math.Sin(theta)
-	vertices[3].y = center.y + (length/2)*math.Sin(theta) - (width/2)*math.Cos(theta)
-
-	return vertices
-}
-
-// GetMidPoint takes as input two OrderedPairs
-// It returns the middle point on a Cartesian plane that is between the two OrderedPairs
-func GetMidPoint(pointOne, pointTwo OrderedPair) OrderedPair {
-	var midPoint OrderedPair
-	midPoint.x = (pointOne.x + pointTwo.x) / 2
-	midPoint.y = (pointOne.y + pointTwo.y) / 2
-	return midPoint
-}
-
-// Elongate() is a method of Rodcell that takes as input a length, and the cell will elongate that length
-func (c *RodCell) Elongate(length float64) {
-	cellLength := c.length + length
-	c.length = cellLength
-}
-
-// Divide() is a method of Rodcell as it returns two childen of the parent cell after division
-// two children should have have the sizes as their paretn and same other fields
-func (c *RodCell) Divide() (*RodCell, *RodCell) {
-	child1 := &RodCell{}
-	child2 := &RodCell{}
-	child1.position.x = c.position.x - ((c.width/2)+((c.maxLength-c.width)/2))*math.Cos(c.angle)
-	child2.position.x = c.position.x + ((c.width/2)+((c.maxLength-c.width)/2))*math.Cos(c.angle)
-	child1.position.y = c.position.y - ((c.width / 2) + ((c.maxLength-c.width)/2)*math.Sin(c.angle))
-	child2.position.y = c.position.y + ((c.width / 2) + ((c.maxLength-c.width)/2)*math.Sin(c.angle))
-	child1.maxLength, child2.maxLength = c.maxLength, c.maxLength
-	child1.red, child1.green, child1.blue = c.red, c.green, c.green
-	child2.red, child2.green, child2.blue = c.red, c.green, c.green
-	child1.length = (c.length - c.width) / 2
-	child2.length = (c.length - c.width) / 2
-	child1.width, child2.width = c.width, c.width
-	child1.angle, child2.angle = c.angle, c.angle
-	return child1, child2
-
+func CopyNutritionBoard(nutritionBoard [][]int) [][]int {
+	newNutritionBoard := make([][]int, len(nutritionBoard))
+	for i := range newNutritionBoard {
+		newNutritionBoard[i] = make([]int, len(nutritionBoard[i]))
+		for j := range newNutritionBoard[i] {
+			newNutritionBoard[i][j] = nutritionBoard[i][j]
+		}
+	}
+	return newNutritionBoard
 }
 
 // CheckSphereCollision is a function that takes as input a culture of spherical cells
@@ -237,17 +213,6 @@ func Distance(p1, p2 OrderedPair) float64 {
 	return math.Sqrt(deltaX*deltaX + deltaY*deltaY)
 }
 
-//--- this function is not called anywhere in the code ---
-// Shove() is a method of a SphereCell that takes as input another overlapping SphereCell s2
-// It updates the position of the SphereCell by pushing the cell away from the overlapping cell
-// func (s *SphereCell) Shove(s2 *SphereCell) {
-// 	//Get overlap between the two cells
-// 	overlap := GetOverlap(s, s2)
-// 	separation := Distance(s.position, s2.position)
-// 	s.position.x -= overlap * (s.position.x - s2.position.x) / separation
-// 	s.position.y -= overlap * (s.position.y - s2.position.y) / separation
-// }
-
 // ShoveOverlapCells is a function that takes as input two SphereCell objects
 // If the two cells are overlapping, the cells will be shoved apart at an angle
 // directly opposite to the point of contact.
@@ -283,3 +248,24 @@ func CopySphereCell(cell *SphereCell) *SphereCell {
 
 	return &newCell
 }
+
+//-- this function is not called anywhere in the code ---
+// GetMidPoint takes as input two OrderedPairs
+// It returns the middle point on a Cartesian plane that is between the two OrderedPairs
+// func GetMidPoint(pointOne, pointTwo OrderedPair) OrderedPair {
+// 	var midPoint OrderedPair
+// 	midPoint.x = (pointOne.x + pointTwo.x) / 2
+// 	midPoint.y = (pointOne.y + pointTwo.y) / 2
+// 	return midPoint
+// }
+
+//--- this function is not called anywhere in the code ---
+// Shove() is a method of a SphereCell that takes as input another overlapping SphereCell s2
+// It updates the position of the SphereCell by pushing the cell away from the overlapping cell
+// func (s *SphereCell) Shove(s2 *SphereCell) {
+// 	//Get overlap between the two cells
+// 	overlap := GetOverlap(s, s2)
+// 	separation := Distance(s.position, s2.position)
+// 	s.position.x -= overlap * (s.position.x - s2.position.x) / separation
+// 	s.position.y -= overlap * (s.position.y - s2.position.y) / separation
+// }
