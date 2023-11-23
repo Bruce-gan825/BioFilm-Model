@@ -96,6 +96,14 @@ func main() {
 	//Initialize culture
 	initialCulture.cells = []*SphereCell{s1p, s2p, s3p, s4p}
 
+	nutritionValue := 10
+
+	nutrition := MakeNutritionBoard(int(initialCulture.width), nutritionValue)
+
+	initialCulture.nutrition = nutrition
+
+	//--------randomly generate a culture of spherical cells------------------
+
 	//Add an assortment of random cells
 	//Create an initial culture
 	var initialCulture3 Culture
@@ -129,7 +137,7 @@ func main() {
 	//-------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture3, 100, 1)
+	timePoints := SimulateBiofilm(initialCulture, 400, 1)
 
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
