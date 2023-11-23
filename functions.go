@@ -27,11 +27,11 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 
 	//growthRate is a constant that determines how much cells grow per time interval
 	// 0.1 = 10% growth per time interval
-	growthRate := 0.04
+	growthRate := 0.05
 	//maxRadius is a constant that determines the maximum radius a cell can grow to before dividing
 	maxRadius := 20.0
 	//cellGrowthNutritionThreshold is a constant that determines the minimum amount of nutrition a cell must have before it can grow
-	cellGrowthNutritionThreshold := 0.8
+	cellGrowthNutritionThreshold := 1.6
 
 	//Iterate over all Cells in the newly created Culture and update their fields
 	for i := range newCulture.cells {
@@ -45,8 +45,9 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 		newCulture.cells[i].cellNutrition = ConsumeNutrients(newCulture.nutrition, newCulture.cells[i])
 
 		//grow cells if cell's nutrition level is greater than threshold
-		if float64(newCulture.cells[i].cellNutrition) >= cellGrowthNutritionThreshold {
+		if newCulture.cells[i].cellNutrition >= cellGrowthNutritionThreshold {
 			newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], growthRate)
+			newCulture.cells[i].cellNutrition -= cellGrowthNutritionThreshold //spend energy to grow
 		}
 		//divide cells if radius is greater than maxRadius
 		if newCulture.cells[i].radius >= maxRadius {
@@ -66,7 +67,7 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 // ConsumeNutrients takes as input a nutrition board and a SphereCell object
 // It returns the updated cellNutrition of the SphereCell object after consuming nutrients
 // And updates the nutrition board accordingly
-func ConsumeNutrients(nutritionBoard [][]int, s *SphereCell) int {
+func ConsumeNutrients(nutritionBoard [][]int, s *SphereCell) float64 {
 	//Note: the cell is treated as a square (width 2*radius) for the purposes of nutrient consumption
 
 	cellNutrient := s.cellNutrition //current cellNutrition

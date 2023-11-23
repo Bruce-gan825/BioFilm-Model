@@ -138,7 +138,7 @@ func main() {
 	//-------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture3, 200, 1)
+	timePoints := SimulateBiofilm(initialCulture, 400, 1)
 
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
