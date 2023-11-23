@@ -283,3 +283,59 @@ func CopySphereCell(cell *SphereCell) *SphereCell {
 // 	s.position.x -= overlap * (s.position.x - s2.position.x) / separation
 // 	s.position.y -= overlap * (s.position.y - s2.position.y) / separation
 // }
+
+// ReleaseSignals generates numParticles of SignalParticle with velocities evenly distributed in all directions.
+// Each particle is positioned outiside from the cell, moving away at a speed of particleSpeed.
+func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) []SignalParticle {
+	particles := make([]SignalParticle, numParticles)
+
+	for i := 0; i < numParticles; i++ {
+		angle := 2 * math.Pi * float64(i) / float64(numParticles)
+		velocityX := math.Cos(angle) * particleSpeed
+		velocityY := math.Sin(angle) * particleSpeed
+
+		particles[i].velocity = OrderedPair{velocityX, velocityY}
+		particles[i].position = OrderedPair{
+			cell.position.x + (cell.radius+1)*math.Cos(angle),
+			cell.position.y + (cell.radius+1)*math.Sin(angle),
+		}
+	}
+	return particles
+}
+
+// ReceiveSignals checks if a cell should receive any signal in the current time step
+// if so, it will move towrad the driection of the signals
+func (cell SphereCell) ReceiveSignals(particles []SignalParticle) {
+	for i := range particles {
+		if cell.CloseTo(particles[i].position) {
+			cell.MoveToward(particles[i].position)
+		}
+	}
+}
+
+// CloseTo detemines if a position is close to a cell. If the position is in the square tangent to the cell,
+// it is considered as close.
+func (cell SphereCell) CloseTo(position OrderedPair) bool {
+	return position.x >= cell.position.x-cell.radius && position.x < cell.position.x+cell.radius &&
+		position.y >= cell.position.y-cell.radius && position.y < cell.position.y+cell.radius
+}
+
+// MoveToward
+func (cell *SphereCell) MoveToward(position OrderedPair) {
+	// Calculate the direction vector
+	directionX := position.x - cell.position.x
+	directionY := position.y - cell.position.y
+
+	// Normalize the direction vector to get the unit direction
+	magnitude := math.Sqrt(directionX*directionX + directionY*directionY)
+	if magnitude == 0 {
+		return // Avoid division by zero; the cell is already at the position
+	}
+
+	unitDirectionX := directionX / magnitude
+	unitDirectionY := directionY / magnitude
+
+	// Set the cell's velocity in the direction of the target position
+	// Assuming you want to set the velocity equal to the unit direction vector
+	cell.velocity = OrderedPair{unitDirectionX, unitDirectionY}
+}
