@@ -37,6 +37,9 @@ type Culture struct {
 
 	//nutrition represents the nutrition board of the culture
 	nutrition [][]int
+
+	//particles represents all signal particles
+	particles []*SignalParticle
 }
 
 // SignalPaticle represents the signal particles released by cells, cells tend to move toward the direction they

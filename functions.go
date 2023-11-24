@@ -33,6 +33,11 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 	//cellGrowthNutritionThreshold is a constant that determines the minimum amount of nutrition a cell must have before it can grow
 	cellGrowthNutritionThreshold := 1.6
 
+	//Update particles
+	for i := range newCulture.particles {
+		newCulture.particles[i].position = UpdateParticle(newCulture.particles[i], time)
+	}
+
 	//Iterate over all Cells in the newly created Culture and update their fields
 	for i := range newCulture.cells {
 		//Update position functions go here
@@ -44,6 +49,9 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 		//Also update the nutrition level on board after it's consumed by the cell
 		newCulture.cells[i].cellNutrition = ConsumeNutrients(newCulture.nutrition, newCulture.cells[i])
 
+		//Every cell should release signals
+		newParticles := newCulture.cells[i].ReleaseSignals(20, 4)
+		newCulture.particles = append(newCulture.particles, newParticles...)
 		//grow cells if cell's nutrition level is greater than threshold
 		if newCulture.cells[i].cellNutrition >= cellGrowthNutritionThreshold {
 			newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], growthRate)
@@ -55,6 +63,10 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 			newCulture.cells[i] = child1                        //replace original cell with child1
 			newCulture.cells = append(newCulture.cells, child2) //append child2 to culture
 		}
+	}
+
+	for i := range newCulture.cells {
+		newCulture.cells[i].ReceiveSignals(newCulture.particles)
 	}
 
 	//Apply simple collision function for the newCulture
@@ -167,6 +179,10 @@ func CopyCulture(culture Culture) Culture {
 	newCulture.nutrition = CopyNutritionBoard(culture.nutrition)
 
 	newCulture.width = culture.width
+	newCulture.particles = make([]*SignalParticle, len(culture.particles))
+	for i := range newCulture.particles {
+		newCulture.particles[i] = CopyParticle(culture.particles[i])
+	}
 	return newCulture
 }
 
@@ -180,6 +196,16 @@ func CopyNutritionBoard(nutritionBoard [][]int) [][]int {
 		}
 	}
 	return newNutritionBoard
+}
+
+// CopyParticle returns a new particle that has same values as the input particle
+func CopyParticle(p *SignalParticle) *SignalParticle {
+	var newParticle SignalParticle
+	newParticle.position.x = p.position.x
+	newParticle.position.y = p.position.y
+	newParticle.velocity.x = p.velocity.x
+	newParticle.velocity.y = p.velocity.y
+	return &newParticle
 }
 
 // CheckSphereCollision is a function that takes as input a culture of spherical cells
@@ -286,8 +312,8 @@ func CopySphereCell(cell *SphereCell) *SphereCell {
 
 // ReleaseSignals generates numParticles of SignalParticle with velocities evenly distributed in all directions.
 // Each particle is positioned outiside from the cell, moving away at a speed of particleSpeed.
-func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) []SignalParticle {
-	particles := make([]SignalParticle, numParticles)
+func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) []*SignalParticle {
+	particles := make([]*SignalParticle, numParticles)
 
 	for i := 0; i < numParticles; i++ {
 		angle := 2 * math.Pi * float64(i) / float64(numParticles)
@@ -305,10 +331,11 @@ func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) [
 
 // ReceiveSignals checks if a cell should receive any signal in the current time step
 // if so, it will move towrad the driection of the signals
-func (cell SphereCell) ReceiveSignals(particles []SignalParticle) {
+func (cell *SphereCell) ReceiveSignals(particles []*SignalParticle) {
 	for i := range particles {
 		if cell.CloseTo(particles[i].position) {
 			cell.MoveToward(particles[i].position)
+			particles = append(particles[:i], particles[i+1:]...)
 		}
 	}
 }
@@ -320,7 +347,7 @@ func (cell SphereCell) CloseTo(position OrderedPair) bool {
 		position.y >= cell.position.y-cell.radius && position.y < cell.position.y+cell.radius
 }
 
-// MoveToward
+// MoveToward is a method of cell that makes cell move towards the input position
 func (cell *SphereCell) MoveToward(position OrderedPair) {
 	// Calculate the direction vector
 	directionX := position.x - cell.position.x
@@ -338,4 +365,13 @@ func (cell *SphereCell) MoveToward(position OrderedPair) {
 	// Set the cell's velocity in the direction of the target position
 	// Assuming you want to set the velocity equal to the unit direction vector
 	cell.velocity = OrderedPair{unitDirectionX, unitDirectionY}
+}
+
+// // UpdateParticle takes as input a Particle object and a float time.
+// It returns the updated position (in components) of that Particle estimated over time seconds as a result of Newtonian physics
+func UpdateParticle(p *SignalParticle, time float64) OrderedPair {
+	var pos OrderedPair
+	pos.x = p.position.x + p.velocity.x*time
+	pos.y = p.position.y + p.velocity.y*time
+	return pos
 }
