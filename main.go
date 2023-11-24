@@ -143,8 +143,18 @@ func main() {
 
 	//-------------------------------
 
+	//----------cell growth parameters------------------
+	//growthRate is a constant that determines how much cells grow per time interval
+	// 0.1 = 10% growth per time interval
+	cellGrowthRate := 0.05
+	//maxRadius is a constant that determines the maximum radius a cell can grow to before dividing
+	cellMaxRadius := 20.0
+	//cellGrowthNutritionThreshold is a constant that determines the minimum amount of nutrition a cell must have before it can grow
+	cellGrowthNutritionThreshold := 1.6
+	//--------------------------------------------------
+
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture, 400, 1)
+	timePoints := SimulateBiofilm(initialCulture, 400, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
 
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")

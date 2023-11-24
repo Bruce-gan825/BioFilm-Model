@@ -7,13 +7,13 @@ import (
 	"math/rand"
 )
 
-// SimulateBiofilm() takes as input a Culture object initialCulture, a number of generations parameter numGens, and a time interval timeStep.
+// SimulateBiofilm() takes as input a Culture object initialCulture, a number of generations parameter numGens, a time interval timeStep, cellGrowthRate, cellMaxRadius, and cellGrowthNutritionThreshold
 // It simulate the biofilm over numGens generations starting with initialCulture in which the system is updated every timeStep units of time, and as a result it should return a slice of numGens + 1 Culture objects
-func SimulateBiofilm(initialCulture Culture, numGens int, time float64) []Culture {
+func SimulateBiofilm(initialCulture Culture, numGens int, time, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold float64) []Culture {
 	timePoints := make([]Culture, numGens+1)
 	timePoints[0] = initialCulture
 	for i := 1; i < numGens+1; i++ {
-		timePoints[i] = UpdateCulture(timePoints[i-1], time)
+		timePoints[i] = UpdateCulture(timePoints[i-1], time, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
 	}
 	return timePoints
 }
@@ -21,17 +21,9 @@ func SimulateBiofilm(initialCulture Culture, numGens int, time float64) []Cultur
 // UpdateCulture takes as input a Culture object and a time float64 parameter.
 // It returns a new Culture object corresponding to updating each Cell's position, velocity, and acceleration within
 // the given time interval
-func UpdateCulture(currentCulture Culture, time float64) Culture {
+func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold float64) Culture {
 	//Create a copy of the current culture to alter
 	newCulture := CopyCulture(currentCulture)
-
-	//growthRate is a constant that determines how much cells grow per time interval
-	// 0.1 = 10% growth per time interval
-	growthRate := 0.05
-	//maxRadius is a constant that determines the maximum radius a cell can grow to before dividing
-	maxRadius := 20.0
-	//cellGrowthNutritionThreshold is a constant that determines the minimum amount of nutrition a cell must have before it can grow
-	cellGrowthNutritionThreshold := 1.6
 
 	//Update particles
 	for i := range newCulture.particles {
@@ -54,11 +46,11 @@ func UpdateCulture(currentCulture Culture, time float64) Culture {
 		newCulture.particles = append(newCulture.particles, newParticles...)
 		//grow cells if cell's nutrition level is greater than threshold
 		if newCulture.cells[i].cellNutrition >= cellGrowthNutritionThreshold {
-			newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], growthRate)
+			newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], cellGrowthRate)
 			newCulture.cells[i].cellNutrition -= cellGrowthNutritionThreshold //spend energy to grow
 		}
-		//divide cells if radius is greater than maxRadius
-		if newCulture.cells[i].radius >= maxRadius {
+		//divide cells if radius is greater than cellMaxRadius
+		if newCulture.cells[i].radius >= cellMaxRadius {
 			child1, child2 := DivideCellSpherical(newCulture.cells[i])
 			newCulture.cells[i] = child1                        //replace original cell with child1
 			newCulture.cells = append(newCulture.cells, child2) //append child2 to culture
