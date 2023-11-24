@@ -1,0 +1,18 @@
+(After adding RandomDiffusion)
+
+With the initial speed of sta1 ~ sta4, the random diffusion is hard to tell,
+So the initial speeds were multiplied by five and ten (only for testing whether func RandomDiffusion works)
+
+for "four cells1":
+	sta1.velocity.x, sta1.velocity.y = 0, 0
+	sta2.velocity.x, sta2.velocity.y = -0.5, -0.5
+	sta3.velocity.x, sta3.velocity.y = 0.5, 0.5
+	sta4.velocity.x, sta4.velocity.y = 0.5, 0.5
+
+for "four cells2":
+	sta1.velocity.x, sta1.velocity.y = 0, 0
+	sta2.velocity.x, sta2.velocity.y = -1, -1
+	sta3.velocity.x, sta3.velocity.y = 1, 1
+	sta4.velocity.x, sta4.velocity.y = 1, 1
+
+The initial speed of cells in culture3 is not modified in main.go when drawing the gif.
