@@ -340,11 +340,12 @@ func (cell *SphereCell) MoveToward(position OrderedPair) {
 	cell.velocity = OrderedPair{unitDirectionX, unitDirectionY}
 }
 
-// RandomDiffusion simulate the random diffusion as Brownian motion
-// It updates the velocity of one SphereCell by changing the
+// RandomDiffusion simulate the random diffusion as Brownian motion.
+// It updates the velocity of one SphereCell by changing the direction randomly but the magnitude of the celocity remains the same.
 func (cell *SphereCell) RandomDiffusion() {
 
 	// Generate a random angle in radians
+	// angle is uniformly distributed between 0 and 2Pi (0 to 360 degrees)
 	angle := rand.Float64() * 2 * math.Pi
 
 	// Calculate the original speed of the cell
