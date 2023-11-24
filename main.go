@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gifhelper"
 	"math/rand"
+	"time"
 )
 
 func main() {
@@ -109,6 +110,9 @@ func main() {
 	var initialCulture3 Culture
 	initialCulture3.width = 1000
 
+	// Seed the random number generator
+	rand.Seed(time.Now().UnixNano())
+
 	initialCulture3.cells = make([]*SphereCell, 200)
 	for i := 0; i < 200; i++ {
 		var cell SphereCell
@@ -119,6 +123,8 @@ func main() {
 		cell.position.x, cell.position.y = rand.Float64()*1000, rand.Float64()*1000
 		//generate random velocity
 		cell.velocity.x, cell.velocity.y = (-2 + rand.Float64()*4), (-2 + rand.Float64()*4)
+		// Call the RandomDiffusion method to simulate the random diffusion of the cell
+		cell.RandomDiffusion()
 		// generate random rgb
 		cell.red, cell.green, cell.blue = uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256))
 
