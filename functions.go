@@ -332,6 +332,8 @@ func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) [
 // ReceiveSignals checks if a cell should receive any signal in the current time step
 // if so, it will move towrad the driection of the signals
 func (cell *SphereCell) ReceiveSignals(particles []*SignalParticle) {
+// if so, it will move towrad the direction of the signals
+func (cell SphereCell) ReceiveSignals(particles []SignalParticle) {
 	for i := range particles {
 		if cell.CloseTo(particles[i].position) {
 			cell.MoveToward(particles[i].position)
@@ -374,4 +376,20 @@ func UpdateParticle(p *SignalParticle, time float64) OrderedPair {
 	pos.x = p.position.x + p.velocity.x*time
 	pos.y = p.position.y + p.velocity.y*time
 	return pos
+}
+
+// RandomDiffusion simulate the random diffusion as Brownian motion.
+// It updates the velocity of one SphereCell by changing the direction randomly but the magnitude of the celocity remains the same.
+func (cell *SphereCell) RandomDiffusion() {
+
+	// Generate a random angle in radians
+	// angle is uniformly distributed between 0 and 2Pi (0 to 360 degrees)
+	angle := rand.Float64() * 2 * math.Pi
+
+	// Calculate the original speed of the cell
+	originalSpeed := math.Sqrt(cell.velocity.x*cell.velocity.x + cell.velocity.y*cell.velocity.y)
+
+	// Update the velocity based on angle and the current speed
+	cell.velocity.x = math.Cos(angle) * originalSpeed
+	cell.velocity.y = math.Sin(angle) * originalSpeed
 }
