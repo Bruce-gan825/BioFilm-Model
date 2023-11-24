@@ -330,10 +330,8 @@ func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) [
 }
 
 // ReceiveSignals checks if a cell should receive any signal in the current time step
-// if so, it will move towrad the driection of the signals
-func (cell *SphereCell) ReceiveSignals(particles []*SignalParticle) {
 // if so, it will move towrad the direction of the signals
-func (cell SphereCell) ReceiveSignals(particles []SignalParticle) {
+func (cell SphereCell) ReceiveSignals(particles []*SignalParticle) {
 	for i := range particles {
 		if cell.CloseTo(particles[i].position) {
 			cell.MoveToward(particles[i].position)
