@@ -36,7 +36,7 @@ type Culture struct {
 	width float64
 
 	//nutrition represents the nutrition board of the culture
-	nutrition [][]int
+	nutrition NutritionBoard
 
 	//particles represents all signal particles
 	particles []*SignalParticle
@@ -47,3 +47,5 @@ type Culture struct {
 type SignalParticle struct {
 	position, velocity OrderedPair
 }
+
+type NutritionBoard [][]int

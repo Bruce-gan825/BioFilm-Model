@@ -25,10 +25,10 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 	//Create a copy of the current culture to alter
 	newCulture := CopyCulture(currentCulture)
 
-	//Update particles
-	for i := range newCulture.particles {
-		newCulture.particles[i].position = UpdateParticle(newCulture.particles[i], time)
-	}
+	// //Update particles
+	// for i := range newCulture.particles {
+	// 	newCulture.particles[i].position = UpdateParticle(newCulture.particles[i], time)
+	// }
 
 	//Iterate over all Cells in the newly created Culture and update their fields
 	for i := range newCulture.cells {
@@ -41,9 +41,10 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 		//Also update the nutrition level on board after it's consumed by the cell
 		newCulture.cells[i].cellNutrition = ConsumeNutrients(newCulture.nutrition, newCulture.cells[i])
 
-		//Every cell should release signals
-		newParticles := newCulture.cells[i].ReleaseSignals(20, 4)
-		newCulture.particles = append(newCulture.particles, newParticles...)
+		// //Every cell should release signals
+		// newParticles := newCulture.cells[i].ReleaseSignals(20, 4)
+		// newCulture.particles = append(newCulture.particles, newParticles...)
+
 		//grow cells if cell's nutrition level is greater than threshold
 		if newCulture.cells[i].cellNutrition >= cellGrowthNutritionThreshold {
 			newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], cellGrowthRate)
@@ -57,9 +58,9 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 		}
 	}
 
-	for i := range newCulture.cells {
-		newCulture.cells[i].ReceiveSignals(newCulture.particles)
-	}
+	// for i := range newCulture.cells {
+	// 	newCulture.cells[i].ReceiveSignals(newCulture.particles)
+	// }
 
 	//Apply simple collision function for the newCulture
 	CheckSphereCollision(newCulture)

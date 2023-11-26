@@ -12,52 +12,6 @@ func main() {
 	var initialCulture Culture
 	initialCulture.width = 1000
 
-	//Test with rod-shaped cells
-	/*
-		//Create a cell
-		var bac1, bac2, bac3, bac4 RodCell
-		bac1.red, bac1.green, bac1.blue = 185, 34, 22
-		bac2.red, bac2.green, bac2.blue = 48, 0, 44
-		bac3.red, bac3.green, bac3.blue = 0, 211, 202
-		bac4.red, bac4.green, bac4.blue = 240, 240, 100
-
-		bac1.position.x, bac1.position.y = 400, 400
-		bac2.position.x, bac2.position.y = 600, 100
-		bac3.position.x, bac3.position.y = 700, 550
-		bac4.position.x, bac4.position.y = 350, 450
-
-		//Angle of cell in radians
-		bac1.angle = 0.4
-		bac2.angle = 0.2
-		bac3.angle = 0.52
-		bac4.angle = 0.4
-
-		bac1.width, bac1.length = 20, 50
-		bac2.width, bac2.length = 10, 40
-		bac3.width, bac3.length = 20, 50
-		bac4.width, bac4.length = 15, 45
-
-		//set maxLength
-		bac1.maxLength = 120
-		bac2.maxLength = 110
-		bac3.maxLength = 120
-		bac4.maxLength = 115
-
-		//Test elongate
-		bac1.Elongate(400)
-		bac5, bac6 := bac1.Divide()
-
-		//Take pointers for each cell
-		//b1p := &bac1
-		b2p := &bac2
-		b3p := &bac3
-		b4p := &bac4
-
-		//Initialize culture
-		initialCulture.cells = []*RodCell{b2p, b3p, b4p, bac5, bac6}
-
-	*/
-
 	//Create a collection of spherical cells
 	var sta1, sta2, sta3, sta4 SphereCell
 	sta1.red, sta1.green, sta1.blue = 20, 45, 100
@@ -99,9 +53,24 @@ func main() {
 
 	nutritionValue := 10
 
-	nutrition := MakeNutritionBoard(int(initialCulture.width), nutritionValue)
+	nutritionShape := "circle"
+
+	nutrition := MakeNutritionBoard(int(initialCulture.width), nutritionValue, nutritionShape)
 
 	initialCulture.nutrition = nutrition
+
+	//----initialCulture2 - just one cell in the middle
+	var initialCulture2 Culture
+	initialCulture2.width = 1000
+
+	var cell SphereCell
+	cell.cellID = 1
+	cell.radius = 10
+	cell.red, cell.green, cell.blue = 20, 45, 100
+	cell.position.x, cell.position.y = 500, 500
+
+	initialCulture2.cells = []*SphereCell{&cell}
+	initialCulture2.nutrition = nutrition
 
 	//--------randomly generate a culture of spherical cells------------------
 
@@ -132,21 +101,10 @@ func main() {
 	}
 	initialCulture3.nutrition = nutrition
 
-	//----------this code is used for testing InitializeCulture function-------
-
-	/*numCells := 50
-	cultureWidth := 1000.0
-	cellWidth := 20.0
-	maxCellLength := 50.0
-
-	initialCulture2 := InitializeCulture(numCells, cultureWidth, cellWidth, maxCellLength)*/
-
-	//-------------------------------
-
 	//----------cell growth parameters------------------
 	//growthRate is a constant that determines how much cells grow per time interval
 	// 0.1 = 10% growth per time interval
-	cellGrowthRate := 0.05
+	cellGrowthRate := 0.07
 	//maxRadius is a constant that determines the maximum radius a cell can grow to before dividing
 	cellMaxRadius := 20.0
 	//cellGrowthNutritionThreshold is a constant that determines the minimum amount of nutrition a cell must have before it can grow
@@ -154,7 +112,7 @@ func main() {
 	//--------------------------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture, 400, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
+	timePoints := SimulateBiofilm(initialCulture2, 400, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
 
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
@@ -167,32 +125,91 @@ func main() {
 	fmt.Println("GIF Drawn!")
 	fmt.Println("Simulation Complete!")
 
-	//Test Elongate
-	/*timePoints := SimulateBiofilm(initialCulture, 0, 5)
+}
+
+//--- functions used for ROD CELLS-----------------
+//Test with rod-shaped cells
+/*
+	//Create a cell
+	var bac1, bac2, bac3, bac4 RodCell
+	bac1.red, bac1.green, bac1.blue = 185, 34, 22
+	bac2.red, bac2.green, bac2.blue = 48, 0, 44
+	bac3.red, bac3.green, bac3.blue = 0, 211, 202
+	bac4.red, bac4.green, bac4.blue = 240, 240, 100
+
+	bac1.position.x, bac1.position.y = 400, 400
+	bac2.position.x, bac2.position.y = 600, 100
+	bac3.position.x, bac3.position.y = 700, 550
+	bac4.position.x, bac4.position.y = 350, 450
+
+	//Angle of cell in radians
+	bac1.angle = 0.4
+	bac2.angle = 0.2
+	bac3.angle = 0.52
+	bac4.angle = 0.4
+
+	bac1.width, bac1.length = 20, 50
+	bac2.width, bac2.length = 10, 40
+	bac3.width, bac3.length = 20, 50
+	bac4.width, bac4.length = 15, 45
+
+	//set maxLength
+	bac1.maxLength = 120
+	bac2.maxLength = 110
+	bac3.maxLength = 120
+	bac4.maxLength = 115
+
+	//Test elongate
+	bac1.Elongate(400)
+	bac5, bac6 := bac1.Divide()
+
+	//Take pointers for each cell
+	//b1p := &bac1
+	b2p := &bac2
+	b3p := &bac3
+	b4p := &bac4
+
+	//Initialize culture
+	initialCulture.cells = []*RodCell{b2p, b3p, b4p, bac5, bac6}
+
+*/
+
+//----------this code is used for testing InitializeCulture function ...FOR ROD CELLS -------
+
+/*numCells := 50
+cultureWidth := 1000.0
+cellWidth := 20.0
+maxCellLength := 50.0
+
+initialCulture2 := InitializeCulture(numCells, cultureWidth, cellWidth, maxCellLength)*/
+
+//-------------------------------
+
+//Test Elongate
+/*timePoints := SimulateBiofilm(initialCulture, 0, 5)
+fmt.Println("Simulation Complete")
+fmt.Println("Drawing cultures...")
+timePoints[0].cells[0].Elongate(50)
+images := AnimateSystem(timePoints, 1000, 1)
+fmt.Println("Images drawn!")
+fmt.Println("Generating an animated GIF...")
+gifhelper.ImagesToGIF(images, "Elongate50")
+fmt.Println("GIF Drawn!")
+fmt.Println("Simulation Complete!")*/
+
+//Test Divide
+/*
+	timePoints := SimulateBiofilm(initialCulture, 0, 5)
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
 	timePoints[0].cells[0].Elongate(50)
+	children := make([]*RodCell, 2)
+	children[0], children[1] = timePoints[0].cells[0].Divide()
+	timePoints[0].cells = append(timePoints[0].cells[1:], children...)
 	images := AnimateSystem(timePoints, 1000, 1)
 	fmt.Println("Images drawn!")
 	fmt.Println("Generating an animated GIF...")
-	gifhelper.ImagesToGIF(images, "Elongate50")
+	gifhelper.ImagesToGIF(images, "Divide")
 	fmt.Println("GIF Drawn!")
-	fmt.Println("Simulation Complete!")*/
-
-	//Test Divide
-	/*
-		timePoints := SimulateBiofilm(initialCulture, 0, 5)
-		fmt.Println("Simulation Complete")
-		fmt.Println("Drawing cultures...")
-		timePoints[0].cells[0].Elongate(50)
-		children := make([]*RodCell, 2)
-		children[0], children[1] = timePoints[0].cells[0].Divide()
-		timePoints[0].cells = append(timePoints[0].cells[1:], children...)
-		images := AnimateSystem(timePoints, 1000, 1)
-		fmt.Println("Images drawn!")
-		fmt.Println("Generating an animated GIF...")
-		gifhelper.ImagesToGIF(images, "Divide")
-		fmt.Println("GIF Drawn!")
-		fmt.Println("Simulation Complete!")
-	*/
-}
+	fmt.Println("Simulation Complete!")
+*/
