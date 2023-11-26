@@ -3,11 +3,11 @@ package main
 // RodCell represents out rod-shaped cells. Length is the length of the rectangle part.
 // Width is the width of the rectangle part and also width/2 is the radius of circle part.
 // Position is the position of the bottom-left corner of the rectangle of the cell.
-type RodCell struct {
-	length, width, angle, maxLength float64
-	red, green, blue                uint8
-	position                        OrderedPair
-}
+// type RodCell struct {
+// 	length, width, angle, maxLength float64
+// 	red, green, blue                uint8
+// 	position                        OrderedPair
+// }
 
 // SphereCell represents a single spherical bacterial cell. It contains fields representing the movement of
 // a single cell in 2D space such as position, velocity, acceleration. It also contains the radius of the cell
