@@ -105,6 +105,20 @@ func main() {
 	}
 	initialCulture3.nutrition = nutrition
 
+	//two cells that have same y position to test quorum sensing
+	var initialCulture4 Culture
+	initialCulture4.width = 1000
+	initialCulture4.cells = make([]*SphereCell, 2)
+	var cell1, cell2 SphereCell
+	cell1.red, cell1.green, cell1.blue = 180, 0, 180
+	cell2.red, cell2.green, cell2.blue = 20, 200, 20
+	cell1.position.x, cell1.position.y = 250, 500
+	cell2.position.x, cell2.position.y = 750, 500
+	cell1.radius, cell2.radius = 25, 25
+	cell1.cellID, cell2.cellID = 1, 2
+	initialCulture4.cells = []*SphereCell{&cell1, &cell2}
+	initialCulture4.nutrition = nutrition
+
 	//----------cell growth parameters------------------
 	//growthRate is a constant that determines how much cells grow per time interval
 	// 0.1 = 10% growth per time interval
@@ -116,7 +130,7 @@ func main() {
 	//--------------------------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture, 100, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
+	timePoints := SimulateBiofilm(initialCulture4, 100, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
 
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")

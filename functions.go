@@ -41,10 +41,6 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 		//Also update the nutrition level on board after it's consumed by the cell
 		newCulture.cells[i].cellNutrition = ConsumeNutrients(newCulture.nutrition, newCulture.cells[i])
 
-		//Every cell should release signals
-		newParticles := newCulture.cells[i].ReleaseSignals(20, 8)
-		newCulture.particles = append(newCulture.particles, newParticles...)
-
 		//grow cells if cell's nutrition level is greater than threshold
 		if newCulture.cells[i].cellNutrition >= cellGrowthNutritionThreshold {
 			newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], cellGrowthRate)
@@ -56,6 +52,10 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 			newCulture.cells[i] = child1                        //replace original cell with child1
 			newCulture.cells = append(newCulture.cells, child2) //append child2 to culture
 		}
+
+		//Every cell should release signals
+		newParticles := newCulture.cells[i].ReleaseSignals(10, 8)
+		newCulture.particles = append(newCulture.particles, newParticles...)
 	}
 
 	for i := range newCulture.cells {
@@ -362,7 +362,7 @@ func (cell *SphereCell) MoveToward(position OrderedPair) {
 
 	// Set the cell's velocity in the direction of the target position
 	// Assuming you want to set the velocity equal to the unit direction vector
-	cell.velocity = OrderedPair{unitDirectionX * 2, unitDirectionY * 2}
+	cell.velocity = OrderedPair{unitDirectionX * 10, unitDirectionY * 10}
 }
 
 // // UpdateParticle takes as input a Particle object and a float time.
