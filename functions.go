@@ -25,10 +25,10 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 	//Create a copy of the current culture to alter
 	newCulture := CopyCulture(currentCulture)
 
-	// //Update particles
-	// for i := range newCulture.particles {
-	// 	newCulture.particles[i].position = UpdateParticle(newCulture.particles[i], time)
-	// }
+	//Update particles
+	for i := range newCulture.particles {
+		newCulture.particles[i].position = UpdateParticle(newCulture.particles[i], time)
+	}
 
 	//Iterate over all Cells in the newly created Culture and update their fields
 	for i := range newCulture.cells {
@@ -41,9 +41,9 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 		//Also update the nutrition level on board after it's consumed by the cell
 		newCulture.cells[i].cellNutrition = ConsumeNutrients(newCulture.nutrition, newCulture.cells[i])
 
-		// //Every cell should release signals
-		// newParticles := newCulture.cells[i].ReleaseSignals(20, 4)
-		// newCulture.particles = append(newCulture.particles, newParticles...)
+		//Every cell should release signals
+		newParticles := newCulture.cells[i].ReleaseSignals(20, 8)
+		newCulture.particles = append(newCulture.particles, newParticles...)
 
 		//grow cells if cell's nutrition level is greater than threshold
 		if newCulture.cells[i].cellNutrition >= cellGrowthNutritionThreshold {
@@ -58,9 +58,9 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 		}
 	}
 
-	// for i := range newCulture.cells {
-	// 	newCulture.cells[i].ReceiveSignals(newCulture.particles)
-	// }
+	for i := range newCulture.cells {
+		newCulture.cells[i].ReceiveSignals(newCulture.particles)
+	}
 
 	//Apply simple collision function for the newCulture
 	CheckSphereCollision(newCulture)
@@ -312,7 +312,8 @@ func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) [
 		angle := 2 * math.Pi * float64(i) / float64(numParticles)
 		velocityX := math.Cos(angle) * particleSpeed
 		velocityY := math.Sin(angle) * particleSpeed
-
+		var newParticle SignalParticle
+		particles[i] = &newParticle
 		particles[i].velocity = OrderedPair{velocityX, velocityY}
 		particles[i].position = OrderedPair{
 			cell.position.x + (cell.radius+1)*math.Cos(angle),
@@ -325,11 +326,15 @@ func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) [
 // ReceiveSignals checks if a cell should receive any signal in the current time step
 // if so, it will move towrad the direction of the signals
 func (cell SphereCell) ReceiveSignals(particles []*SignalParticle) {
-	for i := range particles {
+	for i := 0; i < len(particles)-1; i++ {
 		if cell.CloseTo(particles[i].position) {
 			cell.MoveToward(particles[i].position)
 			particles = append(particles[:i], particles[i+1:]...)
 		}
+	}
+	if cell.CloseTo((particles[len(particles)-1]).position) {
+		cell.MoveToward(particles[len(particles)-1].position)
+		particles = particles[:len(particles)-1]
 	}
 }
 
@@ -357,7 +362,7 @@ func (cell *SphereCell) MoveToward(position OrderedPair) {
 
 	// Set the cell's velocity in the direction of the target position
 	// Assuming you want to set the velocity equal to the unit direction vector
-	cell.velocity = OrderedPair{unitDirectionX, unitDirectionY}
+	cell.velocity = OrderedPair{unitDirectionX * 2, unitDirectionY * 2}
 }
 
 // // UpdateParticle takes as input a Particle object and a float time.
