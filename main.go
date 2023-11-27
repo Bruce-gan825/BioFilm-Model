@@ -2,130 +2,133 @@ package main
 
 import (
 	"fmt"
+	"gifhelper"
+	"math/rand"
+	"time"
 )
 
 func main() {
 	filename := "InputMatrices/nutritionBoard.txt"
 	NBfromFile := ReadNutritionBoardFromFile(filename)
 	fmt.Println(NBfromFile)
-	/*
-		//Create an initial culture
-		var initialCulture Culture
-		initialCulture.width = 1000
 
-		//Create a collection of spherical cells
-		var sta1, sta2, sta3, sta4 SphereCell
-		sta1.red, sta1.green, sta1.blue = 20, 45, 100
-		sta2.red, sta2.green, sta2.blue = 240, 190, 50
-		sta3.red, sta3.green, sta3.blue = 166, 0, 200
-		sta4.red, sta4.green, sta4.blue = 0, 85, 150
+	//Create an initial culture
+	var initialCulture Culture
+	initialCulture.width = 1000
 
-		sta1.position.x, sta1.position.y = 400, 400
-		sta2.position.x, sta2.position.y = 600, 100
-		sta3.position.x, sta3.position.y = 700, 550
-		sta4.position.x, sta4.position.y = 350, 450
+	//Create a collection of spherical cells
+	var sta1, sta2, sta3, sta4 SphereCell
+	sta1.red, sta1.green, sta1.blue = 20, 45, 100
+	sta2.red, sta2.green, sta2.blue = 240, 190, 50
+	sta3.red, sta3.green, sta3.blue = 166, 0, 200
+	sta4.red, sta4.green, sta4.blue = 0, 85, 150
 
-		//Radius of spherical cells
-		sta1.radius, sta2.radius, sta3.radius, sta4.radius = 25, 10, 5, 11
-		sta1.cellID = 1
-		sta2.cellID = 2
-		sta3.cellID = 3
-		sta4.cellID = 4
+	sta1.position.x, sta1.position.y = 400, 400
+	sta2.position.x, sta2.position.y = 600, 100
+	sta3.position.x, sta3.position.y = 700, 550
+	sta4.position.x, sta4.position.y = 350, 450
 
-		//Set initial movement of cells
-		sta1.velocity.x, sta1.velocity.y = 0, 0
-		sta2.velocity.x, sta2.velocity.y = -0.1, -0.1
-		sta3.velocity.x, sta3.velocity.y = 0.1, 0.1
-		sta4.velocity.x, sta4.velocity.y = 0.1, 0.1
+	//Radius of spherical cells
+	sta1.radius, sta2.radius, sta3.radius, sta4.radius = 25, 10, 5, 11
+	sta1.cellID = 1
+	sta2.cellID = 2
+	sta3.cellID = 3
+	sta4.cellID = 4
 
-		sta1.acceleration.x, sta1.acceleration.y = 0, 0
-		sta2.acceleration.x, sta2.acceleration.y = 0, 0
-		sta3.acceleration.x, sta3.acceleration.y = 0, 0
-		sta4.acceleration.x, sta4.acceleration.y = 0, 0
+	//Set initial movement of cells
+	sta1.velocity.x, sta1.velocity.y = 0, 0
+	sta2.velocity.x, sta2.velocity.y = -0.1, -0.1
+	sta3.velocity.x, sta3.velocity.y = 0.1, 0.1
+	sta4.velocity.x, sta4.velocity.y = 0.1, 0.1
 
-		//Take points for each cell
-		s1p := &sta1
-		s2p := &sta2
-		s3p := &sta3
-		s4p := &sta4
+	sta1.acceleration.x, sta1.acceleration.y = 0, 0
+	sta2.acceleration.x, sta2.acceleration.y = 0, 0
+	sta3.acceleration.x, sta3.acceleration.y = 0, 0
+	sta4.acceleration.x, sta4.acceleration.y = 0, 0
 
-		//Initialize culture
-		initialCulture.cells = []*SphereCell{s1p, s2p, s3p, s4p}
+	//Take points for each cell
+	s1p := &sta1
+	s2p := &sta2
+	s3p := &sta3
+	s4p := &sta4
 
-		nutritionValue := 10
+	//Initialize culture
+	initialCulture.cells = []*SphereCell{s1p, s2p, s3p, s4p}
 
-		nutritionShape := "circle"
+	nutritionValue := 10
 
-		nutrition := MakeNutritionBoard(int(initialCulture.width), nutritionValue, nutritionShape)
+	nutritionShape := "circle"
 
-		initialCulture.nutrition = nutrition
+	nutrition := MakeNutritionBoard(int(initialCulture.width), nutritionValue, nutritionShape)
 
-		//----initialCulture2 - just one cell in the middle
-		var initialCulture2 Culture
-		initialCulture2.width = 1000
+	initialCulture.nutrition = nutrition
 
+	//----initialCulture2 - just one cell in the middle
+	var initialCulture2 Culture
+	initialCulture2.width = 1000
+
+	var cell SphereCell
+	cell.cellID = 1
+	cell.radius = 10
+	cell.red, cell.green, cell.blue = 20, 45, 100
+	cell.position.x, cell.position.y = 500, 500
+
+	initialCulture2.cells = []*SphereCell{&cell}
+	initialCulture2.nutrition = nutrition
+
+	//--------randomly generate a culture of spherical cells------------------
+
+	//Add an assortment of random cells
+	//Create an initial culture
+	var initialCulture3 Culture
+	initialCulture3.width = 1000
+
+	// Seed the random number generator
+	rand.Seed(time.Now().UnixNano())
+
+	initialCulture3.cells = make([]*SphereCell, 200)
+	for i := 0; i < 200; i++ {
 		var cell SphereCell
-		cell.cellID = 1
+		cell.cellID = i + 1
 		cell.radius = 10
-		cell.red, cell.green, cell.blue = 20, 45, 100
-		cell.position.x, cell.position.y = 500, 500
 
-		initialCulture2.cells = []*SphereCell{&cell}
-		initialCulture2.nutrition = nutrition
+		//generate random position within cultureWidth
+		cell.position.x, cell.position.y = rand.Float64()*1000, rand.Float64()*1000
+		//generate random velocity
+		cell.velocity.x, cell.velocity.y = (-2 + rand.Float64()*4), (-2 + rand.Float64()*4)
+		// Call the RandomDiffusion method to simulate the random diffusion of the cell
+		cell.RandomDiffusion()
+		// generate random rgb
+		cell.red, cell.green, cell.blue = uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256))
 
-		//--------randomly generate a culture of spherical cells------------------
+		initialCulture3.cells[i] = &cell
+	}
+	initialCulture3.nutrition = nutrition
 
-		//Add an assortment of random cells
-		//Create an initial culture
-		var initialCulture3 Culture
-		initialCulture3.width = 1000
+	//----------cell growth parameters------------------
+	//growthRate is a constant that determines how much cells grow per time interval
+	// 0.1 = 10% growth per time interval
+	cellGrowthRate := 0.07
+	//maxRadius is a constant that determines the maximum radius a cell can grow to before dividing
+	cellMaxRadius := 20.0
+	//cellGrowthNutritionThreshold is a constant that determines the minimum amount of nutrition a cell must have before it can grow
+	cellGrowthNutritionThreshold := 1.6
+	//--------------------------------------------------
 
-		// Seed the random number generator
-		rand.Seed(time.Now().UnixNano())
+	//Test Run BioFilm-Model simulation
+	timePoints := SimulateBiofilm(initialCulture, 100, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
 
-		initialCulture3.cells = make([]*SphereCell, 200)
-		for i := 0; i < 200; i++ {
-			var cell SphereCell
-			cell.cellID = i + 1
-			cell.radius = 10
+	fmt.Println("Simulation Complete")
+	fmt.Println("Drawing cultures...")
 
-			//generate random position within cultureWidth
-			cell.position.x, cell.position.y = rand.Float64()*1000, rand.Float64()*1000
-			//generate random velocity
-			cell.velocity.x, cell.velocity.y = (-2 + rand.Float64()*4), (-2 + rand.Float64()*4)
-			// Call the RandomDiffusion method to simulate the random diffusion of the cell
-			cell.RandomDiffusion()
-			// generate random rgb
-			cell.red, cell.green, cell.blue = uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256))
+	//Animate simulated cultures, create a GIF result
+	images := AnimateSystem(timePoints, 1000, 1)
+	fmt.Println("Images drawn!")
+	fmt.Println("Generating an animated GIF...")
+	gifhelper.ImagesToGIF(images, "output")
+	fmt.Println("GIF Drawn!")
+	fmt.Println("Simulation Complete!")
 
-			initialCulture3.cells[i] = &cell
-		}
-		initialCulture3.nutrition = nutrition
-
-		//----------cell growth parameters------------------
-		//growthRate is a constant that determines how much cells grow per time interval
-		// 0.1 = 10% growth per time interval
-		cellGrowthRate := 0.07
-		//maxRadius is a constant that determines the maximum radius a cell can grow to before dividing
-		cellMaxRadius := 20.0
-		//cellGrowthNutritionThreshold is a constant that determines the minimum amount of nutrition a cell must have before it can grow
-		cellGrowthNutritionThreshold := 1.6
-		//--------------------------------------------------
-
-		//Test Run BioFilm-Model simulation
-		timePoints := SimulateBiofilm(initialCulture2, 400, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
-
-		fmt.Println("Simulation Complete")
-		fmt.Println("Drawing cultures...")
-
-		//Animate simulated cultures, create a GIF result
-		images := AnimateSystem(timePoints, 1000, 1)
-		fmt.Println("Images drawn!")
-		fmt.Println("Generating an animated GIF...")
-		gifhelper.ImagesToGIF(images, "output")
-		fmt.Println("GIF Drawn!")
-		fmt.Println("Simulation Complete!")
-	*/
 }
 
 //--- functions used for ROD CELLS-----------------
