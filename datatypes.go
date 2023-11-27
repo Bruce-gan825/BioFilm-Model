@@ -36,7 +36,7 @@ type Culture struct {
 	width float64
 
 	//nutrition represents the nutrition board of the culture
-	nutrition NutritionBoard
+	nutrition NutritionBoard //square 2D board with length = width
 
 	//particles represents all signal particles
 	particles []*SignalParticle
