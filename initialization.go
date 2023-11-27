@@ -37,11 +37,11 @@ func InitializeCulture(numCells int, cultureWidth, cellWidth, cellMaxLength floa
 
 // MakeNutritionBoard takes as input the width of the culture and the nutrition value
 // Returns a 2D slice of ints representing the nutrition board of the culture
-func MakeNutritionBoard(width int, nutritionValue int, nutritionShape string, NBfromFile [][]int, dontSpread bool) [][]int {
+func MakeNutritionBoard(NBwidth int, nutritionValue int, nutritionShape string, NBfromFile [][]int, dontSpread bool) [][]int {
 
-	nutritionBoard := MakeSquareBoard(width)
-	// if there is a nutrition board from file, update the nutrition board
-	// len(NBfromFile) should be 0 when not reading from input
+	nutritionBoard := MakeSquareBoard(NBwidth)
+	// if input is given from file, use the input board as nutritionBoard
+	// note: len(NBfromFile) should be 0 when not reading from input
 	if len(NBfromFile) > 0 {
 		nutritionBoard.UpdateBoardFromFile(NBfromFile, dontSpread)
 
@@ -57,6 +57,8 @@ func MakeNutritionBoard(width int, nutritionValue int, nutritionShape string, NB
 	return nutritionBoard
 }
 
+// UpdateBoardFromFile takes the board from file as input
+// returns nutrition board appropriate to its size and settings
 func (nb NutritionBoard) UpdateBoardFromFile(NBfromFile [][]int, dontSpread bool) {
 	size := len(nb)
 	size2 := len(NBfromFile)
@@ -73,15 +75,45 @@ func (nb NutritionBoard) UpdateBoardFromFile(NBfromFile [][]int, dontSpread bool
 	} else if size > size2 {
 		fmt.Println("Spread values from input board of size", size2, "to nutrition board of size", size, "...")
 		nb.SpreadValues(NBfromFile)
+	} else { //if input board is larger than the nutBoard
+		fmt.Println("Fit values from input board of size", size2, "into nutrition board of size", size, "...")
+		nb.FitValues(NBfromFile)
 	}
-	// } else { //if input board is larger than the nutBoard
-	// 	nb.FitValues(NBfromFile)
-	// }
 }
 
+// FitValues is ran when the size of the Nutrition Board is smaller than the given board input
+// Function updates the Nutrition Board by trying to squeeze the values into Nutrition Board
+func (nb NutritionBoard) FitValues(NBfromFile [][]int) {
+
+	//interval determines the step size to pull value from file matrix
+	interval := int(math.Round(float64(len(NBfromFile)-1) / float64(len(nb)-1)))
+	fmt.Println(interval)
+
+	for i := range nb {
+		for j := range nb[i] {
+			row := i * interval
+			if row > len(NBfromFile)-1 {
+				row = len(NBfromFile) - 1
+			}
+			col := j * interval
+			if col > len(NBfromFile)-1 {
+				col = len(NBfromFile) - 1
+			}
+
+			nb[i][j] = NBfromFile[row][col]
+		}
+
+	}
+
+}
+
+// SpreadValues is ran when the size of the Nutrition Board is larger than the given input (unless parameter dontSpread is true)
+// Function updates the Nutrition Board by spreading the values as far apart as possible
 func (nb NutritionBoard) SpreadValues(NBfromFile [][]int) {
+
+	//interval determines the step size the value will be placed in the NutritionBoard
 	interval := int(math.Round(float64(len(nb)-1) / float64(len(NBfromFile)-1)))
-	fmt.Println("Interval is", interval)
+
 	for i := range NBfromFile {
 		for j, val := range NBfromFile[i] {
 			row := i * interval

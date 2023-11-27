@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+// ReadNutritionBoardFromFile takes as input a filename and returns a 2D slice of ints
 func ReadNutritionBoardFromFile(filename string) [][]int {
 	var nutritionBoard [][]int
 
@@ -44,6 +45,7 @@ func ReadNutritionBoardFromFile(filename string) [][]int {
 		nutritionBoard = append(nutritionBoard, row)
 	}
 
+	//if the matrix given has different num col and row - panic
 	isSquare := CheckBoardSquare(nutritionBoard)
 	if !isSquare {
 		panic("Input nutrition board is not square")

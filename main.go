@@ -9,15 +9,29 @@ import (
 
 func main() {
 
-	// import text file or not?
+	//======================= set nutrition board parameters ==============================
+	// import text file?
 	importNutritionBoardFromFile := true
-	filename := "InputMatrices/nutritionBoard2.txt" //can update this to be a command line argument
+	//                          put FILE NAME HERE       (and put file in NutritionBoardInputs folder)
+	filename := "NutritionBoardInputs/nutritionBoard2.txt" //can update this to be a command line argument
 
 	var NBfromFile [][]int
 
-	if importNutritionBoardFromFile { //if importing...
+	if importNutritionBoardFromFile { //if import is true
 		NBfromFile = ReadNutritionBoardFromFile(filename) // NBfromFile is a 2D slice of ints
 	}
+
+	NBwidth := 40              // if NBwidth = culture width, nutrition placed every pixel of the board
+	nutritionValue := 10       // value of nutrition in each pixel
+	nutritionShape := "circle" //make circle nutrition board?
+	dontSpread := false        // if input board size < wanted nutrition board size, spread values?
+
+	// MakeNutritionBoard order of prioritization:
+	//1. given input Board from file -> use input Board as Nutrition Board
+	//2. nutritionShape = circle -> make circular nutrition board
+	//3. add nutrition value to every pixel
+	nutrition := MakeNutritionBoard(NBwidth, nutritionValue, nutritionShape, NBfromFile, dontSpread)
+	//================================================================================
 
 	//Create an initial culture
 	var initialCulture Culture
@@ -62,26 +76,19 @@ func main() {
 	//Initialize culture
 	initialCulture.cells = []*SphereCell{s1p, s2p, s3p, s4p}
 
-	nutritionValue := 10
-
-	nutritionShape := "circle"
-	dontSpread := true
-
-	nutrition := MakeNutritionBoard(30, nutritionValue, nutritionShape, NBfromFile, dontSpread)
-
 	initialCulture.nutrition = nutrition
 
 	fmt.Println(initialCulture.nutrition)
 
-	//----initialCulture2 - just one cell in the middle
+	//----initialCulture2 - just one cell in the middle--------------
 	var initialCulture2 Culture
-	initialCulture2.width = 30
+	initialCulture2.width = 50
 
 	var cell SphereCell
 	cell.cellID = 1
-	cell.radius = 1
+	cell.radius = 4
 	cell.red, cell.green, cell.blue = 20, 45, 100
-	cell.position.x, cell.position.y = 15, 15
+	cell.position.x, cell.position.y = 25, 25
 
 	initialCulture2.cells = []*SphereCell{&cell}
 	initialCulture2.nutrition = nutrition
@@ -120,12 +127,14 @@ func main() {
 	// 0.1 = 10% growth per time interval
 	cellGrowthRate := 0.17
 	//maxRadius is a constant that determines the maximum radius a cell can grow to before dividing
-	cellMaxRadius := 1.5
+	cellMaxRadius := 2.3
 	//cellGrowthNutritionThreshold is a constant that determines the minimum amount of nutrition a cell must have before it can grow
 	cellGrowthNutritionThreshold := 0.001
 
-	//for width 1000 and cell radius ~10 - growthRate 0.07, maxRadius 20, threshold 1.6 is a good set of parameters
-	//for width 30 and cell radius 1 - growthRate 0.17, maxRadius 1.5, threshold 0.001 is a good set of parameters
+	//example parameters
+	//width 1000 and cell radius ~10 - growthRate 0.07, maxRadius 20, threshold 1.6
+	//width 30 and cell radius 1 - growthRate 0.17, maxRadius 1.5, threshold 0.001 : single cell
+	//width 50 (nutrition file2 30x30 gradient) radius 4 - growthRate 0.17, maxRadius 2.3, threshold 0.001
 	//--------------------------------------------------
 
 	//Test Run BioFilm-Model simulation
