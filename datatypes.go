@@ -40,6 +40,9 @@ type Culture struct {
 
 	//particles represents all signal particles
 	particles []*SignalParticle
+
+	// a biofilm represents a slice of cells that are within this biofilm
+	biofilms []Biofilm
 }
 
 // SignalPaticle represents the signal particles released by cells, cells tend to move toward the direction they
