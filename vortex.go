@@ -113,3 +113,44 @@ func (b *Biofilm) FindBiofilmCenter() OrderedPair {
 
 	return biofilmCenter
 }
+
+// BioFilmDivide happens when a biofilm reached the size limit
+// It brancehs off the furthest cell and nerby cells to form a new biofilm
+// The input float specifies the radius of the circle will be considered when deciding
+// cells to brach off
+func (b *Biofilm) BioFilmDivide(searchRange float64) (*Biofilm, *Biofilm) {
+	maxDistance := 0.0
+	center := b.FindBiofilmCenter()
+	furthestCell := b.cells[0]
+	for _, cell := range b.cells {
+		d := Distance(cell.position, center)
+		if d > maxDistance {
+			maxDistance = d
+			furthestCell = cell
+		}
+	}
+	var newBiofilm Biofilm
+	j := 0
+	for _, cell := range b.cells {
+		if Distance(cell.position, furthestCell.position) <= searchRange {
+			newBiofilm.cells = append(newBiofilm.cells, cell)
+		} else {
+			b.cells[j] = cell
+			j++
+		}
+	}
+	b.cells = b.cells[:j]
+	ShoveOff(b, &newBiofilm)
+	return b, &newBiofilm
+}
+
+// ShoveOff is a function that pushes a biofilm away from another biofilm
+func ShoveOff(b1, b2 *Biofilm) {
+	b1Center := b1.FindBiofilmCenter()
+	b2Center := b2.FindBiofilmCenter()
+	for i := range b2.cells {
+		//We can multiply some Magnitude here, I set it to 5 for now
+		b2.cells[i].acceleration.x += (b2Center.x - b1Center.x) * 5
+		b2.cells[i].acceleration.y += (b2Center.y - b1Center.y) * 5
+	}
+}

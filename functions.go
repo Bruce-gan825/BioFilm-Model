@@ -305,6 +305,7 @@ func CopySphereCell(cell *SphereCell) *SphereCell {
 
 // ReleaseSignals generates numParticles of SignalParticle with velocities evenly distributed in all directions.
 // Each particle is positioned outiside from the cell, moving away at a speed of particleSpeed.
+// The speed of the particles should be <= the radius of a cell.
 func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) []*SignalParticle {
 	particles := make([]*SignalParticle, numParticles)
 
@@ -326,16 +327,16 @@ func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) [
 // ReceiveSignals checks if a cell should receive any signal in the current time step
 // if so, it will move towrad the direction of the signals
 func (cell SphereCell) ReceiveSignals(particles []*SignalParticle) {
-	for i := 0; i < len(particles)-1; i++ {
-		if cell.CloseTo(particles[i].position) {
-			cell.MoveToward(particles[i].position)
-			particles = append(particles[:i], particles[i+1:]...)
+	j := 0
+	for _, particle := range particles {
+		if !cell.CloseTo(particle.position) {
+			particles[j] = particle
+			j++
+		} else {
+			cell.MoveToward(particle.position)
 		}
 	}
-	if cell.CloseTo((particles[len(particles)-1]).position) {
-		cell.MoveToward(particles[len(particles)-1].position)
-		particles = particles[:len(particles)-1]
-	}
+	particles = particles[:j]
 }
 
 // CloseTo detemines if a position is close to a cell. If the position is in the square tangent to the cell,
@@ -362,10 +363,11 @@ func (cell *SphereCell) MoveToward(position OrderedPair) {
 
 	// Set the cell's velocity in the direction of the target position
 	// Assuming you want to set the velocity equal to the unit direction vector
+	//We can multiply deifferent numbers to unitDirectionX and unitDirectionY
 	cell.velocity = OrderedPair{unitDirectionX * 10, unitDirectionY * 10}
 }
 
-// // UpdateParticle takes as input a Particle object and a float time.
+// UpdateParticle takes as input a Particle object and a float time.
 // It returns the updated position (in components) of that Particle estimated over time seconds as a result of Newtonian physics
 func UpdateParticle(p *SignalParticle, time float64) OrderedPair {
 	var pos OrderedPair
