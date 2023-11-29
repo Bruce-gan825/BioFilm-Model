@@ -51,7 +51,7 @@ func main() {
 
 	cell1.cellID, cell2.cellID = 1, 1
 
-	bead1.bead = []*SphereCell{&cell1, &cell2}
+	bead1.circles = []*SphereCell{&cell1, &cell2}
 
 	initialCulture.nutrition = nutrition
 	initialCulture.beadcells = []*beads{&bead1}

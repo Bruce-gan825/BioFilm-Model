@@ -38,7 +38,7 @@ func DrawToCanvas(culture Culture, canvasWidth int) image.Image {
 	//for _, b := range culture.cells {
 
 	for _, beads := range culture.beadcells {
-		for _, b := range beads.bead {
+		for _, b := range beads.circles {
 
 			//Retrieve the randomized colour of each RodCell from its fields
 			c.SetFillColor(canvas.MakeColor(b.red, b.green, b.blue))

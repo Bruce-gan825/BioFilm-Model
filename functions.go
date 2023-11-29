@@ -22,6 +22,7 @@ func SimulateBiofilm(initialCulture Culture, numGens int, time, cellGrowthRate, 
 // It returns a new Culture object corresponding to updating each Cell's position, velocity, and acceleration within
 // the given time interval
 func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold float64) Culture {
+	runningbeadsimulation := true
 	//Create a copy of the current culture to alter
 	newCulture := CopyCulture(currentCulture)
 
@@ -30,36 +31,85 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 		newCulture.particles[i].position = UpdateParticle(newCulture.particles[i], time)
 	}
 
-	//Iterate over all Cells in the newly created Culture and update their fields
-	for i := range newCulture.cells {
-		//Update position functions go here
-		newCulture.cells[i].acceleration = UpdateAcceleration(currentCulture, newCulture.cells[i])
-		newCulture.cells[i].velocity = UpdateVelocity(newCulture.cells[i], time)
-		newCulture.cells[i].position = UpdatePosition(newCulture.cells[i], time)
+	if runningbeadsimulation {
+		//Iterate over all Cells in the newly created Culture and update their fields
+		for i := range newCulture.beadcells {
+			for j := range newCulture.beadcells[i].circles {
+				//Update position functions go here
+				newCulture.beadcells[i].circles[j].acceleration = UpdateAcceleration(currentCulture, newCulture.beadcells[i].circles[j])
+				newCulture.beadcells[i].circles[j].velocity = UpdateVelocity(newCulture.beadcells[i].circles[j], time)
+				newCulture.beadcells[i].circles[j].position = UpdatePosition(newCulture.beadcells[i].circles[j], time)
 
-		//Update cellNutrition according to nutritions on board and cell's position
-		//Also update the nutrition level on board after it's consumed by the cell
-		newCulture.cells[i].cellNutrition = ConsumeNutrients(newCulture.nutrition, newCulture.cells[i])
+				//Update cellNutrition according to nutritions on board and cell's position
+				//Also update the nutrition level on board after it's consumed by the cell
+				newCulture.beadcells[i].circles[j].cellNutrition = ConsumeNutrients(newCulture.nutrition, newCulture.beadcells[i].circles[j])
 
-		//grow cells if cell's nutrition level is greater than threshold
-		if newCulture.cells[i].cellNutrition >= cellGrowthNutritionThreshold {
-			newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], cellGrowthRate)
-			newCulture.cells[i].cellNutrition -= cellGrowthNutritionThreshold //spend energy to grow
+				// //grow cells if cell's nutrition level is greater than threshold
+				// if newCulture.cells[i].cellNutrition >= cellGrowthNutritionThreshold {
+				// 	newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], cellGrowthRate)
+				// 	newCulture.cells[i].cellNutrition -= cellGrowthNutritionThreshold //spend energy to grow
+				// }
+				// //divide cells if radius is greater than cellMaxRadius
+				// if newCulture.cells[i].radius >= cellMaxRadius {
+				// 	child1, child2 := DivideCellSpherical(newCulture.cells[i])
+				// 	newCulture.cells[i] = child1                        //replace original cell with child1
+				// 	newCulture.cells = append(newCulture.cells, child2) //append child2 to culture
+				// }
+
+				//Every cell should release signals
+				newParticles := newCulture.cells[i].ReleaseSignals(10, 8)
+				newCulture.particles = append(newCulture.particles, newParticles...)
+			}
+			// newCulture.beadcells[i].beadNutrition = ConsumeNutrientsBeads(newCulture.beadcells[i].circles)
+
+			//grow cells if cell's nutrition level is greater than threshold
+			//if newCulture.cells[i].cellNutrition >= cellGrowthNutritionThreshold {
+			newCulture.beadcells[i].radius = GrowCellSpherical(newCulture.cells[i], cellGrowthRate)
+			//newCulture.cells[i].cellNutrition -= cellGrowthNutritionThreshold //spend energy to grow
+			//}
+
+			// if newCulture.beadcells[i].beadNutrition >= float64(newCulture.beadcells[i].maxBeads) {
+			// 	child1, child2 := DivideBeads(newCulture.beadcells[i])
+			// 	newCulture.beadcells[i] = child1                        //replace original cell with child1
+			// 	newCulture.beadcells = append(newCulture.beadcells, child2) //append child2 to culture
+			// }
+
+			for i := range newCulture.cells {
+				newCulture.cells[i].ReceiveSignals(newCulture.particles)
+			}
 		}
-		//divide cells if radius is greater than cellMaxRadius
-		if newCulture.cells[i].radius >= cellMaxRadius {
-			child1, child2 := DivideCellSpherical(newCulture.cells[i])
-			newCulture.cells[i] = child1                        //replace original cell with child1
-			newCulture.cells = append(newCulture.cells, child2) //append child2 to culture
+	} else {
+		//Iterate over all Cells in the newly created Culture and update their fields
+		for i := range newCulture.cells {
+			//Update position functions go here
+			newCulture.cells[i].acceleration = UpdateAcceleration(currentCulture, newCulture.cells[i])
+			newCulture.cells[i].velocity = UpdateVelocity(newCulture.cells[i], time)
+			newCulture.cells[i].position = UpdatePosition(newCulture.cells[i], time)
+
+			//Update cellNutrition according to nutritions on board and cell's position
+			//Also update the nutrition level on board after it's consumed by the cell
+			newCulture.cells[i].cellNutrition = ConsumeNutrients(newCulture.nutrition, newCulture.cells[i])
+
+			//grow cells if cell's nutrition level is greater than threshold
+			if newCulture.cells[i].cellNutrition >= cellGrowthNutritionThreshold {
+				newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], cellGrowthRate)
+				newCulture.cells[i].cellNutrition -= cellGrowthNutritionThreshold //spend energy to grow
+			}
+			//divide cells if radius is greater than cellMaxRadius
+			if newCulture.cells[i].radius >= cellMaxRadius {
+				child1, child2 := DivideCellSpherical(newCulture.cells[i])
+				newCulture.cells[i] = child1                        //replace original cell with child1
+				newCulture.cells = append(newCulture.cells, child2) //append child2 to culture
+			}
+
+			//Every cell should release signals
+			newParticles := newCulture.cells[i].ReleaseSignals(10, 8)
+			newCulture.particles = append(newCulture.particles, newParticles...)
 		}
 
-		//Every cell should release signals
-		newParticles := newCulture.cells[i].ReleaseSignals(10, 8)
-		newCulture.particles = append(newCulture.particles, newParticles...)
-	}
-
-	for i := range newCulture.cells {
-		newCulture.cells[i].ReceiveSignals(newCulture.particles)
+		for i := range newCulture.cells {
+			newCulture.cells[i].ReceiveSignals(newCulture.particles)
+		}
 	}
 
 	//Apply simple collision function for the newCulture
@@ -168,6 +218,12 @@ func CopyCulture(culture Culture) Culture {
 		//newCulture.cells[i] = CopyCell(culture.cells[i])
 		newCulture.cells[i] = CopySphereCell(culture.cells[i])
 	}
+
+	//copy beadcells
+	newCulture.beadcells = make([]*beads, len(culture.beadcells))
+	for i := range newCulture.beadcells {
+		newCulture.beadcells[i] = CopyBeads(culture.beadcells[i])
+	}
 	//copy nutrition board
 	newCulture.nutrition = CopyNutritionBoard(culture.nutrition)
 
@@ -177,6 +233,18 @@ func CopyCulture(culture Culture) Culture {
 		newCulture.particles[i] = CopyParticle(culture.particles[i])
 	}
 	return newCulture
+}
+
+func CopyBeads(bead *beads) *beads {
+	var newBead beads
+	newBead.beadNutrition = bead.beadNutrition
+	newBead.maxBeads = bead.maxBeads
+	newBead.angle = bead.angle
+	newBead.circles = make([]*SphereCell, len(bead.circles))
+	for i := range newBead.circles {
+		newBead.circles[i] = CopySphereCell(bead.circles[i])
+	}
+	return &newBead
 }
 
 // CopyNutritionBoard returns a new nutrition board that has same values as the input nutrition board

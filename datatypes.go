@@ -56,7 +56,7 @@ type SignalParticle struct {
 type NutritionBoard [][]int
 
 type beads struct {
-	bead          []*SphereCell
+	circles       []*SphereCell
 	beadNutrition float64
 	maxBeads      int
 	angle         float64
