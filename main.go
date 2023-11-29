@@ -3,15 +3,14 @@ package main
 import (
 	"fmt"
 	"gifhelper"
-	"math/rand"
-	"time"
+	"math"
 )
 
 func main() {
 
 	//======================= set nutrition board parameters ==============================
 	// import text file?
-	importNutritionBoardFromFile := true
+	importNutritionBoardFromFile := false
 	//                          put FILE NAME HERE       (and put file in NutritionBoardInputs folder)
 	filename := "NutritionBoardInputs/nutritionBoard2.txt" //can update this to be a command line argument
 
@@ -21,7 +20,7 @@ func main() {
 		NBfromFile = ReadNutritionBoardFromFile(filename) // NBfromFile is a 2D slice of ints
 	}
 
-	NBwidth := 40              // if NBwidth = culture width, nutrition placed every pixel of the board
+	NBwidth := 100             // if NBwidth = culture width, nutrition placed every pixel of the board
 	nutritionValue := 10       // value of nutrition in each pixel
 	nutritionShape := "circle" //make circle nutrition board?
 	dontSpread := false        // if input board size < wanted nutrition board size, spread values?
@@ -35,106 +34,133 @@ func main() {
 
 	//Create an initial culture
 	var initialCulture Culture
-	initialCulture.width = 1000
+	initialCulture.width = 100
 
-	//Create a collection of spherical cells
-	var sta1, sta2, sta3, sta4 SphereCell
-	sta1.red, sta1.green, sta1.blue = 20, 45, 100
-	sta2.red, sta2.green, sta2.blue = 240, 190, 50
-	sta3.red, sta3.green, sta3.blue = 166, 0, 200
-	sta4.red, sta4.green, sta4.blue = 0, 85, 150
+	var bead1 beads
+	bead1.angle = 0.785 //  pi/4
 
-	sta1.position.x, sta1.position.y = 400, 400
-	sta2.position.x, sta2.position.y = 600, 100
-	sta3.position.x, sta3.position.y = 700, 550
-	sta4.position.x, sta4.position.y = 350, 450
-
-	//Radius of spherical cells
-	sta1.radius, sta2.radius, sta3.radius, sta4.radius = 25, 10, 5, 11
-	sta1.cellID = 1
-	sta2.cellID = 2
-	sta3.cellID = 3
-	sta4.cellID = 4
-
-	//Set initial movement of cells
-	sta1.velocity.x, sta1.velocity.y = 0, 0
-	sta2.velocity.x, sta2.velocity.y = -0.1, -0.1
-	sta3.velocity.x, sta3.velocity.y = 0.1, 0.1
-	sta4.velocity.x, sta4.velocity.y = 0.1, 0.1
-
-	sta1.acceleration.x, sta1.acceleration.y = 0, 0
-	sta2.acceleration.x, sta2.acceleration.y = 0, 0
-	sta3.acceleration.x, sta3.acceleration.y = 0, 0
-	sta4.acceleration.x, sta4.acceleration.y = 0, 0
-
-	//Take points for each cell
-	s1p := &sta1
-	s2p := &sta2
-	s3p := &sta3
-	s4p := &sta4
-
-	//Initialize culture
-	initialCulture.cells = []*SphereCell{s1p, s2p, s3p, s4p}
-
-	initialCulture.nutrition = nutrition
-
-	fmt.Println(initialCulture.nutrition)
-
-	//----initialCulture2 - just one cell in the middle--------------
-	var initialCulture2 Culture
-	initialCulture2.width = 50
-
-	var cell SphereCell
-	cell.cellID = 1
-	cell.radius = 4
-	cell.red, cell.green, cell.blue = 20, 45, 100
-	cell.position.x, cell.position.y = 25, 25
-
-	initialCulture2.cells = []*SphereCell{&cell}
-	initialCulture2.nutrition = nutrition
-
-	//--------randomly generate a culture of spherical cells------------------
-
-	//Add an assortment of random cells
-	//Create an initial culture
-	var initialCulture3 Culture
-	initialCulture3.width = 1000
-
-	// Seed the random number generator
-	rand.Seed(time.Now().UnixNano())
-
-	initialCulture3.cells = make([]*SphereCell, 200)
-	for i := 0; i < 200; i++ {
-		var cell SphereCell
-		cell.cellID = i + 1
-		cell.radius = 10
-
-		//generate random position within cultureWidth
-		cell.position.x, cell.position.y = rand.Float64()*1000, rand.Float64()*1000
-		//generate random velocity
-		cell.velocity.x, cell.velocity.y = (-2 + rand.Float64()*4), (-2 + rand.Float64()*4)
-		// Call the RandomDiffusion method to simulate the random diffusion of the cell
-		cell.RandomDiffusion()
-		// generate random rgb
-		cell.red, cell.green, cell.blue = uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256))
-
-		initialCulture3.cells[i] = &cell
-	}
-	initialCulture3.nutrition = nutrition
-
-	//two cells that have same y position to test quorum sensing
-	var initialCulture4 Culture
-	initialCulture4.width = 1000
-	initialCulture4.cells = make([]*SphereCell, 2)
 	var cell1, cell2 SphereCell
 	cell1.red, cell1.green, cell1.blue = 180, 0, 180
-	cell2.red, cell2.green, cell2.blue = 20, 200, 20
-	cell1.position.x, cell1.position.y = 250, 500
-	cell2.position.x, cell2.position.y = 750, 500
-	cell1.radius, cell2.radius = 25, 25
-	cell1.cellID, cell2.cellID = 1, 2
-	initialCulture4.cells = []*SphereCell{&cell1, &cell2}
-	initialCulture4.nutrition = nutrition
+	cell2.red, cell2.green, cell2.blue = 180, 0, 180
+	cell1.radius = 5
+	cell2.radius = 5
+
+	cell1.position.x, cell1.position.y = 50, 50
+	hypotenuse := cell1.radius + cell2.radius
+	cell2.position.x, cell2.position.y = cell1.position.x+hypotenuse*math.Cos(bead1.angle), cell1.position.y+hypotenuse*math.Sin(bead1.angle)
+
+	cell1.cellID, cell2.cellID = 1, 1
+
+	bead1.bead = []*SphereCell{&cell1, &cell2}
+
+	initialCulture.nutrition = nutrition
+	initialCulture.beadcells = []*beads{&bead1}
+
+	/*
+		//Create an initial culture
+		var initialCulture Culture
+		initialCulture.width = 1000
+
+		//Create a collection of spherical cells
+		var sta1, sta2, sta3, sta4 SphereCell
+		sta1.red, sta1.green, sta1.blue = 20, 45, 100
+		sta2.red, sta2.green, sta2.blue = 240, 190, 50
+		sta3.red, sta3.green, sta3.blue = 166, 0, 200
+		sta4.red, sta4.green, sta4.blue = 0, 85, 150
+
+		sta1.position.x, sta1.position.y = 400, 400
+		sta2.position.x, sta2.position.y = 600, 100
+		sta3.position.x, sta3.position.y = 700, 550
+		sta4.position.x, sta4.position.y = 350, 450
+
+		//Radius of spherical cells
+		sta1.radius, sta2.radius, sta3.radius, sta4.radius = 25, 10, 5, 11
+		sta1.cellID = 1
+		sta2.cellID = 2
+		sta3.cellID = 3
+		sta4.cellID = 4
+
+		//Set initial movement of cells
+		sta1.velocity.x, sta1.velocity.y = 0, 0
+		sta2.velocity.x, sta2.velocity.y = -0.1, -0.1
+		sta3.velocity.x, sta3.velocity.y = 0.1, 0.1
+		sta4.velocity.x, sta4.velocity.y = 0.1, 0.1
+
+		sta1.acceleration.x, sta1.acceleration.y = 0, 0
+		sta2.acceleration.x, sta2.acceleration.y = 0, 0
+		sta3.acceleration.x, sta3.acceleration.y = 0, 0
+		sta4.acceleration.x, sta4.acceleration.y = 0, 0
+
+		//Take points for each cell
+		s1p := &sta1
+		s2p := &sta2
+		s3p := &sta3
+		s4p := &sta4
+
+		//Initialize culture
+		initialCulture.cells = []*SphereCell{s1p, s2p, s3p, s4p}
+
+		initialCulture.nutrition = nutrition
+
+		fmt.Println(initialCulture.nutrition)
+
+		//----initialCulture2 - just one cell in the middle--------------
+		var initialCulture2 Culture
+		initialCulture2.width = 50
+
+		var cell SphereCell
+		cell.cellID = 1
+		cell.radius = 4
+		cell.red, cell.green, cell.blue = 20, 45, 100
+		cell.position.x, cell.position.y = 25, 25
+
+		initialCulture2.cells = []*SphereCell{&cell}
+		initialCulture2.nutrition = nutrition
+
+		//--------randomly generate a culture of spherical cells------------------
+
+		//Add an assortment of random cells
+		//Create an initial culture
+		var initialCulture3 Culture
+		initialCulture3.width = 1000
+
+		// Seed the random number generator
+		rand.Seed(time.Now().UnixNano())
+
+		initialCulture3.cells = make([]*SphereCell, 200)
+		for i := 0; i < 200; i++ {
+			var cell SphereCell
+			cell.cellID = i + 1
+			cell.radius = 10
+
+			//generate random position within cultureWidth
+			cell.position.x, cell.position.y = rand.Float64()*1000, rand.Float64()*1000
+			//generate random velocity
+			cell.velocity.x, cell.velocity.y = (-2 + rand.Float64()*4), (-2 + rand.Float64()*4)
+			// Call the RandomDiffusion method to simulate the random diffusion of the cell
+			cell.RandomDiffusion()
+			// generate random rgb
+			cell.red, cell.green, cell.blue = uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256))
+
+			initialCulture3.cells[i] = &cell
+		}
+		initialCulture3.nutrition = nutrition
+
+		//two cells that have same y position to test quorum sensing
+		var initialCulture4 Culture
+		initialCulture4.width = 1000
+		initialCulture4.cells = make([]*SphereCell, 2)
+		var cell1, cell2 SphereCell
+		cell1.red, cell1.green, cell1.blue = 180, 0, 180
+		cell2.red, cell2.green, cell2.blue = 20, 200, 20
+		cell1.position.x, cell1.position.y = 250, 500
+		cell2.position.x, cell2.position.y = 750, 500
+		cell1.radius, cell2.radius = 25, 25
+		cell1.cellID, cell2.cellID = 1, 2
+		initialCulture4.cells = []*SphereCell{&cell1, &cell2}
+		initialCulture4.nutrition = nutrition
+
+	*/
 
 	//----------cell growth parameters------------------
 	//growthRate is a constant that determines how much cells grow per time interval
@@ -152,7 +178,7 @@ func main() {
 	//--------------------------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture4, 100, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
+	timePoints := SimulateBiofilm(initialCulture, 100, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
 
 	fmt.Println(timePoints[len(timePoints)-1].nutrition)
 	fmt.Println("Simulation Complete")

@@ -32,6 +32,8 @@ type Culture struct {
 	//cells []*RodCell
 	cells []*SphereCell
 
+	beadcells []*beads
+
 	//Width represents the width of the "canvas" where cells grow
 	width float64
 
@@ -52,3 +54,10 @@ type SignalParticle struct {
 }
 
 type NutritionBoard [][]int
+
+type beads struct {
+	bead          []*SphereCell
+	beadNutrition float64
+	maxBeads      int
+	angle         float64
+}
