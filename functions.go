@@ -26,10 +26,10 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 	//Create a copy of the current culture to alter
 	newCulture := CopyCulture(currentCulture)
 
-	//Update particles
-	for i := range newCulture.particles {
-		newCulture.particles[i].position = UpdateParticle(newCulture.particles[i], time)
-	}
+	// //Update particles
+	// for i := range newCulture.particles {
+	// 	newCulture.particles[i].position = UpdateParticle(newCulture.particles[i], time)
+	// }
 
 	if runningbeadsimulation {
 		//Iterate over all Cells in the newly created Culture and update their fields
@@ -56,15 +56,15 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 				// 	newCulture.cells = append(newCulture.cells, child2) //append child2 to culture
 				// }
 
-				//Every cell should release signals
-				newParticles := newCulture.cells[i].ReleaseSignals(10, 8)
-				newCulture.particles = append(newCulture.particles, newParticles...)
+				// //Every cell should release signals
+				// newParticles := newCulture.cells[i].ReleaseSignals(10, 8)
+				// newCulture.particles = append(newCulture.particles, newParticles...)
 			}
 			// newCulture.beadcells[i].beadNutrition = ConsumeNutrientsBeads(newCulture.beadcells[i].circles)
 
 			//grow cells if cell's nutrition level is greater than threshold
 			//if newCulture.cells[i].cellNutrition >= cellGrowthNutritionThreshold {
-			newCulture.beadcells[i].radius = GrowCellSpherical(newCulture.cells[i], cellGrowthRate)
+			newCulture.beadcells[i].GrowBeads()
 			//newCulture.cells[i].cellNutrition -= cellGrowthNutritionThreshold //spend energy to grow
 			//}
 
@@ -74,10 +74,11 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 			// 	newCulture.beadcells = append(newCulture.beadcells, child2) //append child2 to culture
 			// }
 
-			for i := range newCulture.cells {
-				newCulture.cells[i].ReceiveSignals(newCulture.particles)
-			}
+			// for i := range newCulture.cells {
+			// 	newCulture.cells[i].ReceiveSignals(newCulture.particles)
+			// }
 		}
+
 	} else {
 		//Iterate over all Cells in the newly created Culture and update their fields
 		for i := range newCulture.cells {
@@ -117,6 +118,35 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 
 	return newCulture
 
+}
+
+func (bead *beads) GrowBeads() {
+	//if bead.beadNutrition >= float64(bead.maxBeads) { //???????
+	var circle1, circle2 *SphereCell
+
+	//in Circles []*SphereCell, Circles[0] is the lower bead and Circles[1] is the upper bead
+	//beads will continue to be added so that the even numbers (bottom) odd (top)
+
+	//first copy all atrributed
+	circle1 = bead.circles[len(bead.circles)-2] // initial run will be [0]
+	circle2 = bead.circles[len(bead.circles)-1] // initial run will be [1]
+
+	//update postiions according to the angle and existing beads
+	bottomBeadPosition := circle1.position
+	topBeadPosition := circle2.position
+
+	hypotenuse := 2 * circle1.radius
+	angle := bead.angle
+
+	circle1.position.x = bottomBeadPosition.x + hypotenuse*math.Cos(angle)
+	circle1.position.y = bottomBeadPosition.y + hypotenuse*math.Sin(angle)
+
+	circle2.position.x = topBeadPosition.x + hypotenuse*math.Cos(angle-math.Pi)
+	circle2.position.y = topBeadPosition.y + hypotenuse*math.Sin(angle-math.Pi)
+
+	bead.circles = append(bead.circles, circle1)
+	bead.circles = append(bead.circles, circle2)
+	//}
 }
 
 // ConsumeNutrients takes as input a nutrition board and a SphereCell object
