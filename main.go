@@ -161,7 +161,7 @@ func main() {
 			cell.position.x = float64(400 + (j * 20))
 			cell.position.y = float64(450 + (i * 20))
 			cell.radius = 10
-			cell.red, cell.green, cell.blue = 100, 200, 0
+			cell.red, cell.green, cell.blue = 255, 255, 255
 			initialCulture5.biofilms[0].cells[i*11+j] = &cell
 		}
 	}
@@ -182,7 +182,8 @@ func main() {
 	//--------------------------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture5, 50, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
+	timePoints := SimulateBiofilm(initialCulture5, 10, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
+	fmt.Println(len(timePoints[4].biofilms))
 
 	//fmt.Println(timePoints[len(timePoints)-1].nutrition)
 	fmt.Println("Simulation Complete")

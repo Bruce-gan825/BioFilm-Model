@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 )
@@ -159,9 +160,20 @@ func (b *Biofilm) BioFilmDivide(searchRange float64) *Biofilm {
 func ShoveOff(b1, b2 *Biofilm) {
 	b1Center := b1.FindBiofilmCenter()
 	b2Center := b2.FindBiofilmCenter()
+	directionX := b2Center.x - b1Center.x
+	directionY := b2Center.y - b1Center.y
+	// Normalize the direction vector to get the unit direction
+	magnitude := math.Sqrt(directionX*directionX + directionY*directionY)
+	if magnitude == 0 {
+		return // Avoid division by zero; the cell is already at the position
+	}
+
+	unitDirectionX := directionX / magnitude
+	unitDirectionY := directionY / magnitude
 	for i := range b2.cells {
-		//We can multiply some Magnitude here, I set it to 5 for now
-		b2.cells[i].acceleration.x += (b2Center.x - b1Center.x) * 50
-		b2.cells[i].acceleration.y += (b2Center.y - b1Center.y) * 50
+		//We can multiply some Magnitude here, I set it to 50 for now
+		b2.cells[i].velocity.x += unitDirectionX * 15
+		b2.cells[i].velocity.y += unitDirectionY * 15
+		fmt.Println(b2.cells[i].velocity)
 	}
 }

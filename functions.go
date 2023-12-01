@@ -3,7 +3,6 @@ package main
 //THETA IS IN RADIANS (0 - 2 Pi)
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 )
@@ -35,10 +34,8 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 	limit := 50
 	//Iterate all biofilms and see which needs to be bud off
 	for i := range newCulture.biofilms {
-		fmt.Println(len(newCulture.biofilms[i].cells))
 		if len(newCulture.biofilms[i].cells) > limit {
-			fmt.Println("limit reach")
-			newCulture.biofilms = append(newCulture.biofilms, newCulture.biofilms[i].BioFilmDivide(5))
+			newCulture.biofilms = append(newCulture.biofilms, newCulture.biofilms[i].BioFilmDivide(20))
 		}
 	}
 
@@ -385,7 +382,7 @@ func (cell *SphereCell) MoveToward(position OrderedPair) {
 	// Set the cell's velocity in the direction of the target position
 	// Assuming you want to set the velocity equal to the unit direction vector
 	//We can multiply deifferent numbers to unitDirectionX and unitDirectionY
-	cell.velocity = OrderedPair{unitDirectionX, unitDirectionY}
+	cell.velocity = OrderedPair{unitDirectionX * 0.7, unitDirectionY * 0.7}
 }
 
 // UpdateParticle takes as input a Particle object and a float time.
