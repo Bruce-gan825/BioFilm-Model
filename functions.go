@@ -3,6 +3,7 @@ package main
 //THETA IS IN RADIANS (0 - 2 Pi)
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 )
@@ -30,36 +31,52 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 		newCulture.particles[i].position = UpdateParticle(newCulture.particles[i], time)
 	}
 
-	//Iterate over all Cells in the newly created Culture and update their fields
-	for i := range newCulture.cells {
-		//Update position functions go here
-		newCulture.cells[i].acceleration = UpdateAcceleration(currentCulture, newCulture.cells[i])
-		newCulture.cells[i].velocity = UpdateVelocity(newCulture.cells[i], time)
-		newCulture.cells[i].position = UpdatePosition(newCulture.cells[i], time)
-
-		//Update cellNutrition according to nutritions on board and cell's position
-		//Also update the nutrition level on board after it's consumed by the cell
-		newCulture.cells[i].cellNutrition = ConsumeNutrients(newCulture.nutrition, newCulture.cells[i])
-
-		//grow cells if cell's nutrition level is greater than threshold
-		if newCulture.cells[i].cellNutrition >= cellGrowthNutritionThreshold {
-			newCulture.cells[i].radius = GrowCellSpherical(newCulture.cells[i], cellGrowthRate)
-			newCulture.cells[i].cellNutrition -= cellGrowthNutritionThreshold //spend energy to grow
+	//set the limit here
+	limit := 50
+	//Iterate all biofilms and see which needs to be bud off
+	for i := range newCulture.biofilms {
+		fmt.Println(len(newCulture.biofilms[i].cells))
+		if len(newCulture.biofilms[i].cells) > limit {
+			fmt.Println("limit reach")
+			newCulture.biofilms = append(newCulture.biofilms, newCulture.biofilms[i].BioFilmDivide(5))
 		}
-		//divide cells if radius is greater than cellMaxRadius
-		if newCulture.cells[i].radius >= cellMaxRadius {
-			child1, child2 := DivideCellSpherical(newCulture.cells[i])
-			newCulture.cells[i] = child1                        //replace original cell with child1
-			newCulture.cells = append(newCulture.cells, child2) //append child2 to culture
-		}
-
-		//Every cell should release signals
-		newParticles := newCulture.cells[i].ReleaseSignals(10, 8)
-		newCulture.particles = append(newCulture.particles, newParticles...)
 	}
 
-	for i := range newCulture.cells {
-		newCulture.cells[i].ReceiveSignals(newCulture.particles)
+	//Iterate over all Cells in the newly created Culture and update their fields
+	for i := range newCulture.biofilms {
+		for j := range newCulture.biofilms[i].cells {
+			//Update position functions go here
+			newCulture.biofilms[i].cells[j].acceleration = UpdateAcceleration(currentCulture, newCulture.biofilms[i].cells[j])
+			newCulture.biofilms[i].cells[j].velocity = UpdateVelocity(newCulture.biofilms[i].cells[j], time)
+			newCulture.biofilms[i].cells[j].position = UpdatePosition(newCulture.biofilms[i].cells[j], time)
+
+			//Update cellNutrition according to nutritions on board and cell's position
+			//Also update the nutrition level on board after it's consumed by the cell
+			newCulture.biofilms[i].cells[j].cellNutrition = ConsumeNutrients(newCulture.nutrition, newCulture.biofilms[i].cells[j])
+
+			//grow cells if cell's nutrition level is greater than threshold
+			if newCulture.biofilms[i].cells[j].cellNutrition >= cellGrowthNutritionThreshold {
+				newCulture.biofilms[i].cells[j].radius = GrowCellSpherical(newCulture.biofilms[i].cells[j], cellGrowthRate)
+				newCulture.biofilms[i].cells[j].cellNutrition -= cellGrowthNutritionThreshold //spend energy to grow
+			}
+			//divide cells if radius is greater than cellMaxRadius
+			if newCulture.biofilms[i].cells[j].radius >= cellMaxRadius {
+				child1, child2 := DivideCellSpherical(newCulture.biofilms[i].cells[j])
+				newCulture.biofilms[i].cells[j] = child1                                    //replace original cell with child1
+				newCulture.biofilms[i].cells = append(newCulture.biofilms[i].cells, child2) //append child2 to culture
+			}
+
+			//Every cell should release signals
+			newParticles := newCulture.biofilms[i].cells[j].ReleaseSignals(10, 16)
+			newCulture.particles = append(newCulture.particles, newParticles...)
+		}
+
+	}
+
+	for i := range newCulture.biofilms {
+		for j := range newCulture.biofilms[i].cells {
+			newCulture.biofilms[i].cells[j].ReceiveSignals(newCulture.particles)
+		}
 	}
 
 	//Apply simple collision function for the newCulture
@@ -163,11 +180,7 @@ func UpdatePosition(s *SphereCell, time float64) OrderedPair {
 func CopyCulture(culture Culture) Culture {
 	var newCulture Culture
 	//newCulture.cells = make([]*RodCell, len(culture.cells))
-	newCulture.cells = make([]*SphereCell, len(culture.cells))
-	for i := range newCulture.cells {
-		//newCulture.cells[i] = CopyCell(culture.cells[i])
-		newCulture.cells[i] = CopySphereCell(culture.cells[i])
-	}
+
 	//copy nutrition board
 	newCulture.nutrition = CopyNutritionBoard(culture.nutrition)
 
@@ -175,6 +188,10 @@ func CopyCulture(culture Culture) Culture {
 	newCulture.particles = make([]*SignalParticle, len(culture.particles))
 	for i := range newCulture.particles {
 		newCulture.particles[i] = CopyParticle(culture.particles[i])
+	}
+	newCulture.biofilms = make([]*Biofilm, len(culture.biofilms))
+	for i := range newCulture.biofilms {
+		newCulture.biofilms[i] = CopyFilm(culture.biofilms[i])
 	}
 	return newCulture
 }
@@ -204,19 +221,24 @@ func CopyParticle(p *SignalParticle) *SignalParticle {
 // CheckSphereCollision is a function that takes as input a culture of spherical cells
 // It iterates over every pair of cells within the culture and performs collision detection
 func CheckSphereCollision(newCulture Culture) {
-	for i := 0; i < len(newCulture.cells); i++ {
-		for j := 0; j < len(newCulture.cells); j++ {
-			//Check if cells to collide are not the original cell
-			if newCulture.cells[i].cellID != newCulture.cells[j].cellID {
+	for i := 0; i < len(newCulture.biofilms); i++ {
+		for j := 0; j < len(newCulture.biofilms); j++ {
+			for x := range newCulture.biofilms[i].cells {
+				for y := range newCulture.biofilms[j].cells {
+					//Check if cells to collide are not the original cell
+					if newCulture.biofilms[i].cells[x].cellID != newCulture.biofilms[j].cells[y].cellID {
 
-				//Check if cells overlap
-				if CheckSphereOverlap(newCulture.cells[i], newCulture.cells[j]) {
-					//If cells do overlap, shove both cells
-					ShoveOverlapCells(newCulture.cells[i], newCulture.cells[j])
-					//newCulture.cells[i].red, newCulture.cells[i].green, newCulture.cells[i].blue = 255, 255, 255
-					//newCulture.cells[j].red, newCulture.cells[j].green, newCulture.cells[j].blue = 255, 255, 255
+						//Check if cells overlap
+						if CheckSphereOverlap(newCulture.biofilms[i].cells[x], newCulture.biofilms[j].cells[y]) {
+							//If cells do overlap, shove both cells
+							ShoveOverlapCells(newCulture.biofilms[i].cells[x], newCulture.biofilms[j].cells[y])
+							//newCulture.cells[i].red, newCulture.cells[i].green, newCulture.cells[i].blue = 255, 255, 255
+							//newCulture.cells[j].red, newCulture.cells[j].green, newCulture.cells[j].blue = 255, 255, 255
+						}
+					}
 				}
 			}
+
 		}
 	}
 }
@@ -306,9 +328,8 @@ func CopySphereCell(cell *SphereCell) *SphereCell {
 // ReleaseSignals generates numParticles of SignalParticle with velocities evenly distributed in all directions.
 // Each particle is positioned outiside from the cell, moving away at a speed of particleSpeed.
 // The speed of the particles should be <= the radius of a cell.
-func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) []*SignalParticle {
+func (cell *SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) []*SignalParticle {
 	particles := make([]*SignalParticle, numParticles)
-
 	for i := 0; i < numParticles; i++ {
 		angle := 2 * math.Pi * float64(i) / float64(numParticles)
 		velocityX := math.Cos(angle) * particleSpeed
@@ -317,8 +338,8 @@ func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) [
 		particles[i] = &newParticle
 		particles[i].velocity = OrderedPair{velocityX, velocityY}
 		particles[i].position = OrderedPair{
-			cell.position.x + (cell.radius+1)*math.Cos(angle),
-			cell.position.y + (cell.radius+1)*math.Sin(angle),
+			cell.position.x + (cell.radius*1.1)*math.Cos(angle),
+			cell.position.y + (cell.radius*1.1)*math.Sin(angle),
 		}
 	}
 	return particles
@@ -326,7 +347,7 @@ func (cell SphereCell) ReleaseSignals(particleSpeed float64, numParticles int) [
 
 // ReceiveSignals checks if a cell should receive any signal in the current time step
 // if so, it will move towrad the direction of the signals
-func (cell SphereCell) ReceiveSignals(particles []*SignalParticle) {
+func (cell *SphereCell) ReceiveSignals(particles []*SignalParticle) {
 	j := 0
 	for _, particle := range particles {
 		if !cell.CloseTo(particle.position) {
@@ -364,7 +385,7 @@ func (cell *SphereCell) MoveToward(position OrderedPair) {
 	// Set the cell's velocity in the direction of the target position
 	// Assuming you want to set the velocity equal to the unit direction vector
 	//We can multiply deifferent numbers to unitDirectionX and unitDirectionY
-	cell.velocity = OrderedPair{unitDirectionX * 10, unitDirectionY * 10}
+	cell.velocity = OrderedPair{unitDirectionX, unitDirectionY}
 }
 
 // UpdateParticle takes as input a Particle object and a float time.
@@ -380,14 +401,24 @@ func UpdateParticle(p *SignalParticle, time float64) OrderedPair {
 // It updates the velocity of one SphereCell by changing the direction randomly but the magnitude of the celocity remains the same.
 func (cell *SphereCell) RandomDiffusion() {
 
-	// Generate a random angle in radians
-	// angle is uniformly distributed between 0 and 2Pi (0 to 360 degrees)
+	// //Generate a random angle in radians
+	// //angle is uniformly distributed between 0 and 2Pi (0 to 360 degrees)
 	angle := rand.Float64() * 2 * math.Pi
 
-	// Calculate the original speed of the cell
+	// //Calculate the original speed of the cell
 	originalSpeed := math.Sqrt(cell.velocity.x*cell.velocity.x + cell.velocity.y*cell.velocity.y)
 
-	// Update the velocity based on angle and the current speed
+	// //Update the velocity based on angle and the current speed
 	cell.velocity.x = math.Cos(angle) * originalSpeed
 	cell.velocity.y = math.Sin(angle) * originalSpeed
+}
+
+// CopyFilm is a function that returns a copy of the input biofilm
+func CopyFilm(b *Biofilm) *Biofilm {
+	var newFilm = new(Biofilm)
+	newFilm.cells = make([]*SphereCell, len(b.cells))
+	for i := range b.cells {
+		newFilm.cells[i] = CopySphereCell(b.cells[i])
+	}
+	return newFilm
 }

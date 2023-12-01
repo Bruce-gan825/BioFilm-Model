@@ -2,6 +2,7 @@ package main
 
 import (
 	"math"
+	"math/rand"
 )
 
 // Biofilm contains a slice of SphereCell pointers, representing the cells that are part of this particular biofilm
@@ -73,15 +74,21 @@ func (c *Culture) FindCultureCenter() OrderedPair {
 	var sumX, sumY float64
 	var cultureCenter OrderedPair
 
-	numCells := len(c.cells)
+	numCells := 0
+	for i := range c.biofilms {
+		numCells += len(c.biofilms[i].cells)
+	}
 
 	if numCells == 0 {
 		return OrderedPair{0, 0}
 	}
 
-	for _, cell := range c.cells {
-		sumX += cell.position.x
-		sumY += cell.position.y
+	for _, biofilm := range c.biofilms {
+		for _, cell := range biofilm.cells {
+			sumX += cell.position.x
+			sumY += cell.position.y
+		}
+
 	}
 
 	// Averaging the sum to find the centroid
@@ -118,7 +125,7 @@ func (b *Biofilm) FindBiofilmCenter() OrderedPair {
 // It brancehs off the furthest cell and nerby cells to form a new biofilm
 // The input float specifies the radius of the circle will be considered when deciding
 // cells to brach off
-func (b *Biofilm) BioFilmDivide(searchRange float64) (*Biofilm, *Biofilm) {
+func (b *Biofilm) BioFilmDivide(searchRange float64) *Biofilm {
 	maxDistance := 0.0
 	center := b.FindBiofilmCenter()
 	furthestCell := b.cells[0]
@@ -131,8 +138,12 @@ func (b *Biofilm) BioFilmDivide(searchRange float64) (*Biofilm, *Biofilm) {
 	}
 	var newBiofilm Biofilm
 	j := 0
+	newR := uint8(rand.Intn(256))
+	newG := uint8(rand.Intn(256))
+	newB := uint8(rand.Intn(256))
 	for _, cell := range b.cells {
 		if Distance(cell.position, furthestCell.position) <= searchRange {
+			cell.red, cell.green, cell.blue = newR, newG, newB
 			newBiofilm.cells = append(newBiofilm.cells, cell)
 		} else {
 			b.cells[j] = cell
@@ -141,7 +152,7 @@ func (b *Biofilm) BioFilmDivide(searchRange float64) (*Biofilm, *Biofilm) {
 	}
 	b.cells = b.cells[:j]
 	ShoveOff(b, &newBiofilm)
-	return b, &newBiofilm
+	return &newBiofilm
 }
 
 // ShoveOff is a function that pushes a biofilm away from another biofilm
@@ -150,7 +161,7 @@ func ShoveOff(b1, b2 *Biofilm) {
 	b2Center := b2.FindBiofilmCenter()
 	for i := range b2.cells {
 		//We can multiply some Magnitude here, I set it to 5 for now
-		b2.cells[i].acceleration.x += (b2Center.x - b1Center.x) * 5
-		b2.cells[i].acceleration.y += (b2Center.y - b1Center.y) * 5
+		b2.cells[i].acceleration.x += (b2Center.x - b1Center.x) * 50
+		b2.cells[i].acceleration.y += (b2Center.y - b1Center.y) * 50
 	}
 }

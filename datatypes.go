@@ -30,7 +30,7 @@ type OrderedPair struct {
 // Culture represents all the cells in the biofilm at the time.
 type Culture struct {
 	//cells []*RodCell
-	cells []*SphereCell
+	//cells []*SphereCell
 
 	//Width represents the width of the "canvas" where cells grow
 	width float64
@@ -42,7 +42,7 @@ type Culture struct {
 	particles []*SignalParticle
 
 	// a biofilm represents a slice of cells that are within this biofilm
-	biofilms []Biofilm
+	biofilms []*Biofilm
 }
 
 // SignalPaticle represents the signal particles released by cells, cells tend to move toward the direction they

@@ -21,7 +21,7 @@ func main() {
 		NBfromFile = ReadNutritionBoardFromFile(filename) // NBfromFile is a 2D slice of ints
 	}
 
-	NBwidth := 40              // if NBwidth = culture width, nutrition placed every pixel of the board
+	NBwidth := 1000            // if NBwidth = culture width, nutrition placed every pixel of the board
 	nutritionValue := 10       // value of nutrition in each pixel
 	nutritionShape := "circle" //make circle nutrition board?
 	dontSpread := false        // if input board size < wanted nutrition board size, spread values?
@@ -73,24 +73,35 @@ func main() {
 	s3p := &sta3
 	s4p := &sta4
 
+	//Initialize biofilm
+	initialCulture.biofilms = make([]*Biofilm, 4)
+
+	for i := range initialCulture.biofilms {
+		initialCulture.biofilms[i] = &Biofilm{} // Allocate a new Biofilm
+	}
 	//Initialize culture
-	initialCulture.cells = []*SphereCell{s1p, s2p, s3p, s4p}
+	initialCulture.biofilms[0].cells = []*SphereCell{s1p}
+	initialCulture.biofilms[1].cells = []*SphereCell{s2p}
+	initialCulture.biofilms[2].cells = []*SphereCell{s3p}
+	initialCulture.biofilms[3].cells = []*SphereCell{s4p}
 
 	initialCulture.nutrition = nutrition
 
-	fmt.Println(initialCulture.nutrition)
+	//fmt.Println(initialCulture.nutrition)
 
 	//----initialCulture2 - just one cell in the middle--------------
 	var initialCulture2 Culture
-	initialCulture2.width = 50
+	initialCulture2.width = 500
 
 	var cell SphereCell
 	cell.cellID = 1
 	cell.radius = 4
 	cell.red, cell.green, cell.blue = 20, 45, 100
-	cell.position.x, cell.position.y = 25, 25
+	cell.position.x, cell.position.y = 250, 250
 
-	initialCulture2.cells = []*SphereCell{&cell}
+	initialCulture2.biofilms = make([]*Biofilm, 1)
+	initialCulture2.biofilms[0] = &Biofilm{}
+	initialCulture2.biofilms[0].cells = []*SphereCell{&cell}
 	initialCulture2.nutrition = nutrition
 
 	//--------randomly generate a culture of spherical cells------------------
@@ -103,7 +114,9 @@ func main() {
 	// Seed the random number generator
 	rand.Seed(time.Now().UnixNano())
 
-	initialCulture3.cells = make([]*SphereCell, 200)
+	initialCulture3.biofilms = make([]*Biofilm, 1)
+	initialCulture3.biofilms[0] = &Biofilm{}
+	initialCulture3.biofilms[0].cells = make([]*SphereCell, 200)
 	for i := 0; i < 200; i++ {
 		var cell SphereCell
 		cell.cellID = i + 1
@@ -118,30 +131,47 @@ func main() {
 		// generate random rgb
 		cell.red, cell.green, cell.blue = uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(rand.Intn(256))
 
-		initialCulture3.cells[i] = &cell
+		initialCulture3.biofilms[0].cells[i] = &cell
 	}
 	initialCulture3.nutrition = nutrition
 
 	//two cells that have same y position to test quorum sensing
-	var initialCulture4 Culture
-	initialCulture4.width = 1000
-	initialCulture4.cells = make([]*SphereCell, 2)
-	var cell1, cell2 SphereCell
-	cell1.red, cell1.green, cell1.blue = 180, 0, 180
-	cell2.red, cell2.green, cell2.blue = 20, 200, 20
-	cell1.position.x, cell1.position.y = 250, 500
-	cell2.position.x, cell2.position.y = 750, 500
-	cell1.radius, cell2.radius = 25, 25
-	cell1.cellID, cell2.cellID = 1, 2
-	initialCulture4.cells = []*SphereCell{&cell1, &cell2}
-	initialCulture4.nutrition = nutrition
+	// var initialCulture4 Culture
+	// initialCulture4.width = 1000
+	// initialCulture4.cells = make([]*SphereCell, 2)
+	// var cell1, cell2 SphereCell
+	// cell1.red, cell1.green, cell1.blue = 180, 0, 180
+	// cell2.red, cell2.green, cell2.blue = 20, 200, 20
+	// cell1.position.x, cell1.position.y = 250, 500
+	// cell2.position.x, cell2.position.y = 750, 500
+	// cell1.radius, cell2.radius = 25, 25
+	// cell1.cellID, cell2.cellID = 1, 2
+	// initialCulture4.cells = []*SphereCell{&cell1, &cell2}
+	// initialCulture4.nutrition = nutrition
+
+	//55 cells in the same biofilm, for biofilm division test
+	var initialCulture5 Culture
+	initialCulture5.width = 1000
+	initialCulture5.biofilms = make([]*Biofilm, 1)
+	initialCulture5.biofilms[0] = &Biofilm{}
+	initialCulture5.biofilms[0].cells = make([]*SphereCell, 55)
+	for i := 0; i < 5; i++ {
+		for j := 0; j < 11; j++ {
+			var cell SphereCell
+			cell.position.x = float64(400 + (j * 20))
+			cell.position.y = float64(450 + (i * 20))
+			cell.radius = 10
+			cell.red, cell.green, cell.blue = 100, 200, 0
+			initialCulture5.biofilms[0].cells[i*11+j] = &cell
+		}
+	}
 
 	//----------cell growth parameters------------------
 	//growthRate is a constant that determines how much cells grow per time interval
 	// 0.1 = 10% growth per time interval
 	cellGrowthRate := 0.17
 	//maxRadius is a constant that determines the maximum radius a cell can grow to before dividing
-	cellMaxRadius := 2.3
+	cellMaxRadius := 20.0
 	//cellGrowthNutritionThreshold is a constant that determines the minimum amount of nutrition a cell must have before it can grow
 	cellGrowthNutritionThreshold := 0.001
 
@@ -152,9 +182,9 @@ func main() {
 	//--------------------------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture4, 100, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
+	timePoints := SimulateBiofilm(initialCulture5, 50, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
 
-	fmt.Println(timePoints[len(timePoints)-1].nutrition)
+	//fmt.Println(timePoints[len(timePoints)-1].nutrition)
 	fmt.Println("Simulation Complete")
 	fmt.Println("Drawing cultures...")
 
