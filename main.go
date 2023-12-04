@@ -91,18 +91,27 @@ func main() {
 
 	//----initialCulture2 - just one cell in the middle--------------
 	var initialCulture2 Culture
-	initialCulture2.width = 500
+	initialCulture2.width = 1000
 
 	var cell SphereCell
 	cell.cellID = 1
 	cell.radius = 4
 	cell.red, cell.green, cell.blue = 20, 45, 100
-	cell.position.x, cell.position.y = 250, 250
+	cell.position.x, cell.position.y = 500, 500
 
 	initialCulture2.biofilms = make([]*Biofilm, 1)
 	initialCulture2.biofilms[0] = &Biofilm{}
 	initialCulture2.biofilms[0].cells = []*SphereCell{&cell}
-	initialCulture2.nutrition = nutrition
+	//initialCulture2.nutrition = nutrition
+	initialCulture2.nutrition = make([][]int, 1000)
+	for i := range initialCulture2.nutrition {
+		initialCulture2.nutrition[i] = make([]int, 1000)
+	}
+	for i := range initialCulture2.nutrition {
+		for j := range initialCulture2.nutrition[i] {
+			initialCulture2.nutrition[i][j] = 5
+		}
+	}
 
 	//--------randomly generate a culture of spherical cells------------------
 
@@ -184,8 +193,7 @@ func main() {
 	//--------------------------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture4, 50, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
-	fmt.Println(len(timePoints[4].biofilms))
+	timePoints := SimulateBiofilm(initialCulture2, 50, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
 
 	//fmt.Println(timePoints[len(timePoints)-1].nutrition)
 	fmt.Println("Simulation Complete")
