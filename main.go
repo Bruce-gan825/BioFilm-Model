@@ -136,18 +136,20 @@ func main() {
 	initialCulture3.nutrition = nutrition
 
 	//two cells that have same y position to test quorum sensing
-	// var initialCulture4 Culture
-	// initialCulture4.width = 1000
-	// initialCulture4.cells = make([]*SphereCell, 2)
-	// var cell1, cell2 SphereCell
-	// cell1.red, cell1.green, cell1.blue = 180, 0, 180
-	// cell2.red, cell2.green, cell2.blue = 20, 200, 20
-	// cell1.position.x, cell1.position.y = 250, 500
-	// cell2.position.x, cell2.position.y = 750, 500
-	// cell1.radius, cell2.radius = 25, 25
-	// cell1.cellID, cell2.cellID = 1, 2
-	// initialCulture4.cells = []*SphereCell{&cell1, &cell2}
-	// initialCulture4.nutrition = nutrition
+	var initialCulture4 Culture
+	initialCulture4.width = 1000
+	initialCulture4.biofilms = make([]*Biofilm, 1)
+	initialCulture4.biofilms[0] = &Biofilm{}
+	initialCulture4.biofilms[0].cells = make([]*SphereCell, 2)
+	var cell1, cell2 SphereCell
+	cell1.red, cell1.green, cell1.blue = 180, 0, 180
+	cell2.red, cell2.green, cell2.blue = 20, 200, 20
+	cell1.position.x, cell1.position.y = 400, 500
+	cell2.position.x, cell2.position.y = 600, 500
+	cell1.radius, cell2.radius = 25, 25
+	cell1.cellID, cell2.cellID = 1, 2
+	initialCulture4.biofilms[0].cells = []*SphereCell{&cell1, &cell2}
+	initialCulture4.nutrition = nutrition
 
 	//55 cells in the same biofilm, for biofilm division test
 	var initialCulture5 Culture
@@ -182,7 +184,7 @@ func main() {
 	//--------------------------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture2, 10, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
+	timePoints := SimulateBiofilm(initialCulture4, 50, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
 	fmt.Println(len(timePoints[4].biofilms))
 
 	//fmt.Println(timePoints[len(timePoints)-1].nutrition)

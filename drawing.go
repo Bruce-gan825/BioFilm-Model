@@ -87,14 +87,14 @@ func DrawToCanvas(culture Culture, canvasWidth int) image.Image {
 	}
 
 	//Draw Signal Particles
-	for _, p := range culture.particles {
-		c.SetFillColor(canvas.MakeColor(255, 255, 255))
-		cX := (p.position.x / culture.width) * float64(canvasWidth)
-		cY := (p.position.y / culture.width) * float64(canvasWidth)
-		c.Circle(cX, cY, 1)
-		c.Fill()
+	// for _, p := range culture.particles {
+	// 	c.SetFillColor(canvas.MakeColor(255, 255, 255))
+	// 	cX := (p.position.x / culture.width) * float64(canvasWidth)
+	// 	cY := (p.position.y / culture.width) * float64(canvasWidth)
+	// 	c.Circle(cX, cY, 1)
+	// 	c.Fill()
 
-	}
+	// }
 	// Return the image created
 	return c.GetImage()
 }
