@@ -182,7 +182,7 @@ func main() {
 	//--------------------------------------------------
 
 	//Test Run BioFilm-Model simulation
-	timePoints := SimulateBiofilm(initialCulture5, 10, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
+	timePoints := SimulateBiofilm(initialCulture2, 10, 1, cellGrowthRate, cellMaxRadius, cellGrowthNutritionThreshold)
 	fmt.Println(len(timePoints[4].biofilms))
 
 	//fmt.Println(timePoints[len(timePoints)-1].nutrition)

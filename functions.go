@@ -357,11 +357,9 @@ func (cell *SphereCell) ReceiveSignals(particles []*SignalParticle) {
 	particles = particles[:j]
 }
 
-// CloseTo detemines if a position is close to a cell. If the position is in the square tangent to the cell,
-// it is considered as close.
+// CloseTo detemines if a position is close to a cell.
 func (cell SphereCell) CloseTo(position OrderedPair) bool {
-	return position.x >= cell.position.x-cell.radius && position.x < cell.position.x+cell.radius &&
-		position.y >= cell.position.y-cell.radius && position.y < cell.position.y+cell.radius
+	return Distance(cell.position, position) <= cell.radius
 }
 
 // MoveToward is a method of cell that makes cell move towards the input position
