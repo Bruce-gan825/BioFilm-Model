@@ -34,16 +34,22 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 	limit := 50
 	//Iterate all biofilms and see which needs to be bud off
 	for i := range newCulture.biofilms {
-		if len(newCulture.biofilms[i].cells) > limit {
-			newCulture.biofilms = append(newCulture.biofilms, newCulture.biofilms[i].BioFilmDivide(20))
+		if newCulture.biofilms[i].divisionCountDown == 0 {
+			if len(newCulture.biofilms[i].cells) > limit {
+				newCulture.biofilms = append(newCulture.biofilms, newCulture.biofilms[i].BioFilmDivide(50))
+			}
+		} else {
+			newCulture.biofilms[i].divisionCountDown--
 		}
+
 	}
 
 	//Iterate over all Cells in the newly created Culture and update their fields
 	for i := range newCulture.biofilms {
+		newCulture.biofilms[i].UpdateAcceleration()
 		for j := range newCulture.biofilms[i].cells {
 			//Update position functions go here
-			newCulture.biofilms[i].cells[j].acceleration = UpdateAcceleration(currentCulture, newCulture.biofilms[i].cells[j])
+			//newCulture.biofilms[i].cells[j].acceleration = UpdateAcceleration(newCulture.biofilms[i], newCulture.biofilms[i].cells[j])
 			newCulture.biofilms[i].cells[j].velocity = UpdateVelocity(newCulture.biofilms[i].cells[j], time)
 			newCulture.biofilms[i].cells[j].position = UpdatePosition(newCulture.biofilms[i].cells[j], time)
 
@@ -75,7 +81,7 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 			newCulture.biofilms[i].cells[j].ReceiveSignals(newCulture.particles)
 		}
 	}
-	newCulture.Vortex(0.001)
+	//newCulture.Vortex(0.001)
 	//Apply simple collision function for the newCulture
 	CheckSphereCollision(newCulture)
 
@@ -147,12 +153,15 @@ func GrowCellSpherical(s *SphereCell, growthRate float64) float64 {
 
 // UpdateAcceleration takes as input a Culture object and a particular cell within the Culture
 // It returns the net acceleration due to the net forces that a Cell experiences at a given point in time.
-func UpdateAcceleration(currentCulture Culture, s *SphereCell) OrderedPair {
-	var accel OrderedPair
-	//ADD NET FORCE CALCULATION HERE
-	accel.x = 0
-	accel.y = 0
-	return accel
+func (b *Biofilm) UpdateAcceleration() {
+	if b.justShoveOff {
+		b.justShoveOff = false
+	} else {
+		for i := range b.cells {
+			b.cells[i].acceleration.x = 0
+			b.cells[i].acceleration.y = 0
+		}
+	}
 }
 
 // UpdateVelocity takes as input a Cell object and a float time.
@@ -415,5 +424,7 @@ func CopyFilm(b *Biofilm) *Biofilm {
 	for i := range b.cells {
 		newFilm.cells[i] = CopySphereCell(b.cells[i])
 	}
+	newFilm.divisionCountDown = b.divisionCountDown
+	newFilm.justShoveOff = b.justShoveOff
 	return newFilm
 }

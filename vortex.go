@@ -1,14 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 )
 
 // Biofilm contains a slice of SphereCell pointers, representing the cells that are part of this particular biofilm
 type Biofilm struct {
-	cells []*SphereCell
+	cells             []*SphereCell
+	divisionCountDown int
+	justShoveOff      bool
 }
 
 // Vortex describes the movement of each biofilm around the center of culture
@@ -152,6 +153,7 @@ func (b *Biofilm) BioFilmDivide(searchRange float64) *Biofilm {
 		}
 	}
 	b.cells = b.cells[:j]
+	b.divisionCountDown = 3
 	ShoveOff(b, &newBiofilm)
 	return &newBiofilm
 }
@@ -171,9 +173,9 @@ func ShoveOff(b1, b2 *Biofilm) {
 	unitDirectionX := directionX / magnitude
 	unitDirectionY := directionY / magnitude
 	for i := range b2.cells {
-		//We can multiply some Magnitude here, I set it to 50 for now
-		b2.cells[i].velocity.x += unitDirectionX * 15
-		b2.cells[i].velocity.y += unitDirectionY * 15
-		fmt.Println(b2.cells[i].velocity)
+		//We can multiply some Magnitude here, I set it to 40 for now
+		b2.cells[i].acceleration.x += unitDirectionX * 50
+		b2.cells[i].acceleration.y += unitDirectionY * 50
 	}
+	b2.justShoveOff = true
 }
