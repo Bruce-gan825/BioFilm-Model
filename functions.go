@@ -75,7 +75,7 @@ func UpdateCulture(currentCulture Culture, time, cellGrowthRate, cellMaxRadius, 
 			newCulture.biofilms[i].cells[j].ReceiveSignals(newCulture.particles)
 		}
 	}
-
+	newCulture.Vortex(0.001)
 	//Apply simple collision function for the newCulture
 	CheckSphereCollision(newCulture)
 
