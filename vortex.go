@@ -2,49 +2,34 @@ package main
 
 import (
 	"math"
-	"math/rand"
 )
 
 // Biofilm contains a slice of SphereCell pointers, representing the cells that are part of this particular biofilm
 type Biofilm struct {
-	cells             []*SphereCell
-	divisionCountDown int
-	justShoveOff      bool
+	cells []*SphereCell
 }
 
-// Vortex describes the movement of each biofilm around the center of culture
-// cells in the same biofilm rotates together with the same angular velocity (seen a biofilm as a rigid body)
+// Vortex describes the movement of each biofilm around it respective biofilm center
 func (c *Culture) Vortex(angularVelocity float64) {
-	cultureCenter := c.FindCultureCenter()
 
 	for _, biofilm := range c.biofilms {
 		biofilmCenter := biofilm.FindBiofilmCenter()
 
-		// Calculate the components of the distance between the culture center and the biofilm center
-		deltaX := biofilmCenter.x - cultureCenter.x
-		deltaY := biofilmCenter.y - cultureCenter.y
-
-		// Calculate the angle and distance from the culture center to the biofilm center
-		// calculate the angle in radians between the positive x-axis of a plane and the point given by the coordinates (deltaX, deltaY)
-		biofilmAngle := math.Atan2(deltaY, deltaX)
-		biofilmDistance := math.Sqrt(deltaX*deltaX + deltaY*deltaY)
-
-		// Rotate the biofilm center around the culture center
-		newBiofilmAngle := biofilmAngle + angularVelocity
-		newBiofilmCenter := OrderedPair{
-			x: cultureCenter.x + biofilmDistance*math.Cos(newBiofilmAngle),
-			y: cultureCenter.y + biofilmDistance*math.Sin(newBiofilmAngle),
-		}
-
-		// Update the position of each cell in the same biofilm
+		// Rotate each cell in the biofilm around the biofilm center
 		for _, cell := range biofilm.cells {
 			// Calculate the relative position of the cell to the original biofilm center
 			relativeX := cell.position.x - biofilmCenter.x
 			relativeY := cell.position.y - biofilmCenter.y
 
-			// Update the cell's position, maintaining its relative position to the biofilm center
-			cell.position.x = newBiofilmCenter.x + relativeX
-			cell.position.y = newBiofilmCenter.y + relativeY
+			// Calculate the angle and distance from the biofilm center to the cell
+			cellAngle := math.Atan2(relativeY, relativeX)
+			cellDistance := math.Sqrt(relativeX*relativeX + relativeY*relativeY)
+
+			// Update the cell's position
+			// Rotate the cell around the biofilm center
+			newCellAngle := cellAngle + angularVelocity
+			cell.position.x = biofilmCenter.x + cellDistance*math.Cos(newCellAngle)
+			cell.position.y = biofilmCenter.y + cellDistance*math.Sin(newCellAngle)
 		}
 	}
 }
@@ -76,21 +61,15 @@ func (c *Culture) FindCultureCenter() OrderedPair {
 	var sumX, sumY float64
 	var cultureCenter OrderedPair
 
-	numCells := 0
-	for i := range c.biofilms {
-		numCells += len(c.biofilms[i].cells)
-	}
+	numCells := len(c.cells)
 
 	if numCells == 0 {
 		return OrderedPair{0, 0}
 	}
 
-	for _, biofilm := range c.biofilms {
-		for _, cell := range biofilm.cells {
-			sumX += cell.position.x
-			sumY += cell.position.y
-		}
-
+	for _, cell := range c.cells {
+		sumX += cell.position.x
+		sumY += cell.position.y
 	}
 
 	// Averaging the sum to find the centroid
@@ -121,61 +100,4 @@ func (b *Biofilm) FindBiofilmCenter() OrderedPair {
 	biofilmCenter.y = sumY / float64(numCells)
 
 	return biofilmCenter
-}
-
-// BioFilmDivide happens when a biofilm reached the size limit
-// It brancehs off the furthest cell and nerby cells to form a new biofilm
-// The input float specifies the radius of the circle will be considered when deciding
-// cells to brach off
-func (b *Biofilm) BioFilmDivide(searchRange float64) *Biofilm {
-	maxDistance := 0.0
-	center := b.FindBiofilmCenter()
-	furthestCell := b.cells[0]
-	for _, cell := range b.cells {
-		d := Distance(cell.position, center)
-		if d > maxDistance {
-			maxDistance = d
-			furthestCell = cell
-		}
-	}
-	var newBiofilm Biofilm
-	j := 0
-	newR := uint8(rand.Intn(256))
-	newG := uint8(rand.Intn(256))
-	newB := uint8(rand.Intn(256))
-	for _, cell := range b.cells {
-		if Distance(cell.position, furthestCell.position) <= searchRange {
-			cell.red, cell.green, cell.blue = newR, newG, newB
-			newBiofilm.cells = append(newBiofilm.cells, cell)
-		} else {
-			b.cells[j] = cell
-			j++
-		}
-	}
-	b.cells = b.cells[:j]
-	b.divisionCountDown = 3
-	ShoveOff(b, &newBiofilm)
-	return &newBiofilm
-}
-
-// ShoveOff is a function that pushes a biofilm away from another biofilm
-func ShoveOff(b1, b2 *Biofilm) {
-	b1Center := b1.FindBiofilmCenter()
-	b2Center := b2.FindBiofilmCenter()
-	directionX := b2Center.x - b1Center.x
-	directionY := b2Center.y - b1Center.y
-	// Normalize the direction vector to get the unit direction
-	magnitude := math.Sqrt(directionX*directionX + directionY*directionY)
-	if magnitude == 0 {
-		return // Avoid division by zero; the cell is already at the position
-	}
-
-	unitDirectionX := directionX / magnitude
-	unitDirectionY := directionY / magnitude
-	for i := range b2.cells {
-		//We can multiply some Magnitude here, I set it to 40 for now
-		b2.cells[i].acceleration.x += unitDirectionX * 50
-		b2.cells[i].acceleration.y += unitDirectionY * 50
-	}
-	b2.justShoveOff = true
 }
