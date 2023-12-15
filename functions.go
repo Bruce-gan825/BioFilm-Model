@@ -310,27 +310,6 @@ func CopySphereCell(cell *SphereCell) *SphereCell {
 	return &newCell
 }
 
-//-- this function is not called anywhere in the code ---
-// GetMidPoint takes as input two OrderedPairs
-// It returns the middle point on a Cartesian plane that is between the two OrderedPairs
-// func GetMidPoint(pointOne, pointTwo OrderedPair) OrderedPair {
-// 	var midPoint OrderedPair
-// 	midPoint.x = (pointOne.x + pointTwo.x) / 2
-// 	midPoint.y = (pointOne.y + pointTwo.y) / 2
-// 	return midPoint
-// }
-
-//--- this function is not called anywhere in the code ---
-// Shove() is a method of a SphereCell that takes as input another overlapping SphereCell s2
-// It updates the position of the SphereCell by pushing the cell away from the overlapping cell
-// func (s *SphereCell) Shove(s2 *SphereCell) {
-// 	//Get overlap between the two cells
-// 	overlap := GetOverlap(s, s2)
-// 	separation := Distance(s.position, s2.position)
-// 	s.position.x -= overlap * (s.position.x - s2.position.x) / separation
-// 	s.position.y -= overlap * (s.position.y - s2.position.y) / separation
-// }
-
 // ReleaseSignals generates numParticles of SignalParticle with velocities evenly distributed in all directions.
 // Each particle is positioned outiside from the cell, moving away at a speed of particleSpeed.
 // The speed of the particles should be <= the radius of a cell.
