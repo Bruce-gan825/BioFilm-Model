@@ -20,6 +20,8 @@ Ensure that your version of Golang has GIO installed. You can install GIO by nav
 go install gio
 go mod tidy
 
+
+
 Alternatively, you can use the following command:
 
 go install gioui.org/cmd/gogio@latest
