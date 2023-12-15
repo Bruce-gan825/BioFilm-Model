@@ -1,6 +1,10 @@
 # BioFilm-Model
- This is the final project for 02601.
-The model is based on the biofilm model from https://pubmed.ncbi.nlm.nih.gov/29593289/ and https://pubs.acs.org/doi/10.1021/sb300031n. The simulation provides a graphical user interface written entirely in Golang that allows researchers to visualize and study the interactions of bacteria in the early stages of biofilm development 
+This is the final project for 02601.
+ 
+The model is based on the biofilm model from https://pubmed.ncbi.nlm.nih.gov/29593289/ and https://pubs.acs.org/doi/10.1021/sb300031n. The simulation provides a graphical user interface written entirely in Golang that allows researchers to visualize and study the interactions of bacteria in the early stages of biofilm development.
+
+## Demo Video
+See the project in action here: https://www.youtube.com/watch?v=6MiCJpkqquc
 
 ## Installation and Setup 
 !!! This project uses Go modules! To ensure that you can run the program smoothly on your machine, please ensure that GO111MODULE is set to on. If your environment does not have GO111MODULE set to on, you can enable Go modules for all projects within the GOPATH using the following command: 
@@ -27,5 +31,21 @@ Once GIO has been installed onto your Go machine, the program should be ready to
 cd go/src/EarlyBiofilm 
 ./EarlyBiofilm <time> <growth rate> <cell size> <threshold> <nutrition map filepath> 
 
+*Time: a decimal number that represents the interval of time for a single step of the simulation. For best results, set equal to 1.
+*Growth Rate: a decimal number that represents the amount that a spherical cell grows upon consuming nutrients within the simulation. For best results, set equal to 0.06-0.10. 
+*Cell Size: a decimal number that represents the maximum size a cell can reach before performing binary fission. For best results, set equal to 10-20. 
+*Threshold: a decimal number that represents the minimum amount of nutrients a cell needs before performing a single growth event. For best results, set equal to 5-10. 
+
 ## Demo Run
-Our project is designed such that you can 
+Our project is designed such that you can place any text file representing a 2D array for a nutrient map into the folder "NutritionBoardInputs". The program can then take in your desired nutrient map and initialize the growth environment prior to allowing the user to spawn cells and further nutrients. 
+
+To perform a test run you can run one of the sample nutrient maps included with our project:
+
+./EggTimer 1 0.07 8 10 test_nutrient_elevation.txt
+
+Try spawning cells in the simulation and observing the growth stages of the biofilm as well as the number of Colony Forming Units (n) over time!
+
+## Simulation Features
+*Integrated mouse input: use the mouse to interact with the simulation by spawning in new spherical cells or by spawning in new nutrients for your biofilms. Use the scroll wheel to zoom in and out of the simulation.
+*Integrated keyboard input: use WASD keys to move around the simulation. Use spacebar to pause/play the simulation. 
+*Adjust growth parameters: you can adjust the growthRate, cellSize, and threshold variables once executing the simulation as necessary. This allows the program to be tuned to different species of spherical bacteria. 
