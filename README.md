@@ -42,7 +42,9 @@ cd go/src/EarlyBiofilm
 *Nutrition Map Filepath: the name of the desired nutrient map to test. You can use one of the provided maps to test (gopher.txt, dendritic.txt). If you do not want to use a custom nutrient map and would prefer to use a uniform map instead, write **false** for this input. 
 
 ## Demo Run
-Our project is designed such that you can place any text file representing a 2D array for a nutrient map into the folder "NutritionBoardInputs". The program can then take in your desired nutrient map and initialize the growth environment prior to allowing the user to spawn cells and further nutrients. 
+Our project is designed such that you can place any text file representing a 2D array for a nutrient map into the folder "NutritionBoardInputs". The program can then take in your desired nutrient map and initialize the growth environment prior to allowing the user to spawn cells and further nutrients. If you instead have a .png or .jpg image for which you want to convert into a 2D array representing the nutrient map, you can use our script FluorescenceToMap.py, which you can execute using the following command from the Terminal or Powershell: 
+
+python3 FluorescenceToMap.py <input_image_path> <output_file_path> 
 
 To perform a test run you can run one of the sample nutrient maps included with our project:
 
