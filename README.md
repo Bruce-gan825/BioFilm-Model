@@ -50,7 +50,7 @@ python3 FluorescenceToMap.py <input_image_path> <output_file_path>
 
 To perform a test run you can run one of the sample nutrient maps included with our project:
 
-./EggTimer 1 0.07 8 10 test_nutrient_elevation.txt
+./EarlyBiofilm 1 0.07 8 10 test_nutrient_elevation.txt
 
 Try spawning cells in the simulation and observing the growth stages of the biofilm as well as the number of Colony Forming Units (n) over time!
 
