@@ -39,6 +39,8 @@ cd go/src/EarlyBiofilm
 
 *Threshold: a decimal number that represents the minimum amount of nutrients a cell needs before performing a single growth event. For best results, set equal to 5-10. 
 
+*Nutrition Map Filepath: the name of the desired nutrient map to test. You can use one of the provided maps to test (gopher.txt, dendritic.txt). If you do not want to use a custom nutrient map and would prefer to use a uniform map instead, write **false** for this input. 
+
 ## Demo Run
 Our project is designed such that you can place any text file representing a 2D array for a nutrient map into the folder "NutritionBoardInputs". The program can then take in your desired nutrient map and initialize the growth environment prior to allowing the user to spawn cells and further nutrients. 
 
